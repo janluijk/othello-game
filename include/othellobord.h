@@ -12,4 +12,4 @@ class Othellobord {
   public:
     
     // TODO
-};//othellobord
+};//othellobord   
