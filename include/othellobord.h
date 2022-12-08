@@ -18,11 +18,21 @@ class Othellobord {
     Bordvakje* ingang;
     // TODO
   public:
-    int mapgrootte;
     
-    Bordvakje* ritsMap(int, Bordvakje*);
+    // Variables
+    int mapgrootte;
+
+    // Functions
+    void afdrukken(Bordvakje* ingang);
+
+    Bordvakje* ritsMap();
+
+    
+    
+    
+    // Constructor
     Othellobord() {
       mapgrootte = 8;
     }
     // TODO
-};//othellobord
+};

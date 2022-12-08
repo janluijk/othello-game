@@ -3,7 +3,117 @@
 using namespace std;
 
 
-// Returnt EERSTE karakter: van invoer
+/*
+// Class
+class Puzzel {
+    public:
+        Puzzel() { // Constructor
+            // Array initialiseren met alle waarden op 0
+            for (int y = 0; y < MAX; y++) {
+                for (int x = 0; x < MAX; x++) {
+                    map[y][x]       = 0; // Array vullen met lampen uit (o)
+                    oplossing[y][x] = 0;
+                }
+            }
+
+            // Mapgrootte
+            hoogte  = 5;
+            breedte = 5;
+
+            // Cursorvariablen
+            cursorX = 0;
+            cursorY = 0;
+            actieveCursor = 0;
+
+            // Parameters
+            percentage = 50;
+            isTorus    = 0;
+            valsSpel   = 0;
+            tweedeVeeg = 0;
+
+            aantalZetten    = 0;
+            aantalLampenAan = 0;
+            isOplosbaar     = 1;
+
+            // karakters van display
+            karLampAan = 'x';
+            karLampUit = '.';
+            karCursor  = 'C';
+        }
+
+        // Memberfuncties
+        void drukAf();
+        void vulMap();
+        void leegPuzzel();
+        void zetPercentage();
+        void tekenMenu();
+        void puzzelMenu();
+        void parameterMenu();
+        void doeZet(int, int, bool);
+        void zetMapGrootte();
+        void veegPuzzel();
+        void beweegCursor();
+        void verwerkZet();
+        bool eindPositie();
+        void genereerPuzzel();
+        void cursorOpties();
+        void keerOmLamp(int, int);
+        bool isOpgelost();
+        void vulOplossingRandom();
+        void vulMapRandom();
+        void losPuzzelOp();
+        void displayOpties();
+        void cursorFunctie();
+
+    private:
+        // Map arrays
+        bool map[MAX][MAX];
+        bool oplossing[MAX][MAX];
+
+        int  aantalZetten; // Tellers
+        int  aantalLampenAan;
+        bool isOplosbaar;
+
+        bool isTorus; // Parameters
+        bool valsSpel;
+        int  percentage;
+        int  hoogte, breedte;
+        bool tweedeVeeg;
+
+        char karLampAan = '*';
+        char karLampUit = '0';
+        char karCursor  = 'C';
+
+        bool actieveCursor; // Cursorvariablen
+        bool cursorheeftFunctie;
+        bool cursorZetAan;
+        int  cursorX, cursorY;
+};
+
+void infoBlokje() {
+    cout << "LIGHTS OUT\n"
+         << "Dit programma is gemaakt door Vitto van Leeuwen en Jan Luijk.\n"
+         << "In dit programma kan je het spel LIGHTS OUT spelen. \nDe "
+         << "bedoelingvan het spel is om alle lichten in het spel uit te "
+         << "krijgen. \nDit doe je door zetten te doen. \nEen zet veranderd"
+         << " de status van de lamp en van de aangrenzende buren. \n"
+         << "Om dit spel te spelen moet je eerst een puzzel genereren. \nGa "
+         << "dan naar het tekenmenu.\nDat doe je door de juiste karakter in te "
+         << "voeren.\nIn het tekenmenu zie je een aantal opties die je kunt"
+         << " doen. \nEen van deze opties is het genereren van de puzzel. "
+         << "\nNa hetgenereren van een puzzel kun je gaan oplossen. \n"
+         << "Ga terug naar het hoofdmenu met de letter [T].\n"
+         << "Ga dan naar puzzelmenu -> zet. Hier kan je zetten invoeren. \nDat "
+         << "doe je door bordlocaties op te geven, net als in bij schaken.\n"
+         << "Veel plezier! \n\n"
+         << " Een aantal andere opties die dit spel kan doen: \n"
+         << " - Oplossen van puzzels \n - Veranderen van mapgrootte\n -"
+         << " Aanpassen van karakter voor"
+         << "lampen aan en uit\n - Gebruik van het volgalgoritme\n "
+         << " " << endl;
+}
+
+// Returnt EERSTE karakter van invoer
 char leesInvoer() {
     char input;
 
@@ -13,88 +123,76 @@ char leesInvoer() {
     return input;
 }
 
+// Leegt de invoerstream tot de eerstvolgende enter
+void leegInvoer() {
+    char input;
+
+    do {
+        input = cin.get();
+    } while (input != '\n');
+}
+
+*/
+/*
+// Returnt getal, leest alleen eerste getal!
+int leesGetal() {
+    char input;
+    int  getal    = 0;
+    int  decimaal = 0;
+
+    input = leesInvoer(); // eerste niet-enter
+    while(input < '0' || input > '9') { // zolang geen getal, verder zoeken
+        input = cin.get();
+    }
+    while(input >= '0' && input <= '9') { // zolang integer: maak getal van
+        decimaal = input - '0'; // converteren van karakter naar integer
+        getal = getal * 10 + decimaal;
+
+        input = cin.get();
+    }
+    return getal;
+}
+
+*/
+
+
 // Leegt de terminal, maakt alles mooier
 void leegTerminal() {
-    // std::system("CLS");
-    /*
+    //std::system("CLS");
+
     cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
          << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
          << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-    */
 }
 
-void Afdrukken(Bordvakje *ingang) {
-    Bordvakje* omlaagptr = ingang;
-    Bordvakje* rechtsptr;
+/*
+// Geeft een random getal
+int rng() {
+    static int seed = 42;        // Static: seed wordt 1 keer geinitialiseerd
+    unsigned int m = 2147483647; // Lehmer random number generator
+    unsigned int a = 16807;      // Dit zijn specifiek gekozen constanten
 
-    while(omlaagptr) {
-        rechtsptr = omlaagptr;
-        while(rechtsptr) {
-            cout << (rechtsptr->kleur) << " | ";
-            rechtsptr = rechtsptr->buren[2];
-        }
-        cout << "\n";
-        omlaagptr = omlaagptr->buren[4];
+    seed = seed * a % m;
+    return seed;
+}
+
+*/
+// Klemt waarde tussen een ondergrens en bovengrens en returnt deze
+/*
+int klem(int getal, int ondergrens, int bovengrens) {
+    if (getal < ondergrens) {
+        getal = ondergrens;
     }
-}
-
-void Toevoegen (Bordvakje* & ingang, char kleur) {
-  Bordvakje* p;  // hulppointertje
-  p = new Bordvakje;
-
-  p->kleur = kleur;
-  p->buren[2] = ingang;
-  ingang = p;
-}
-
-void Verwijderen(Bordvakje *&ingang)
-{
-    Bordvakje *p = ingang; // hulppointertje
-    if (ingang != nullptr) {
-        ingang = ingang->buren[2];
-        delete p;             // in deze volgorde
-    }                         // if
-} // Verwijderen
-
-
-void Othellobord::ritsMap(int mapgrootte, Bordvakje* ingang) {
-    Bordvakje* hoofdIngang = NULL; 
-    Bordvakje* vorige, *boven = new Bordvakje;
-    
-    for (int i = 0; i < mapgrootte; i++) {
-        Bordvakje* rijIngang; //row-wise head of list.
-        Bordvakje *vorige = new Bordvakje; // dummy node to mark start of left pointer.
-        for (int j = 0; j < mapgrootte; j++) {
-            Bordvakje* temp = new Bordvakje;
- 
-            if (j == 0) {
-                head_row = temp;
-            }
-            if (i == 0 && j == 0) {
-                head_main = temp;
-            } 
-
-            temp->buren[6] = vorige;
-            vorige->buren[2] = temp;
-            
-            if (i == mapgrootte - 1) temp->buren[4] = NULL;
- 
-            //This is only used for 1st row.
-            if (!boven->buren[2]) {
-                boven->buren[2] = new Bordvakje;
-            }
-            boven = boven->buren[2];
- 
-            temp->buren[0] = boven;
-            boven->buren[4] = temp;
-            vorige = temp;
- 
-            if (j == mapgrootte - 1) {
-                vorige->buren[2] = NULL;
-            }
-        }
-        boven = rijIngang->buren[6];
+    if (getal > bovengrens) {
+        getal = bovengrens;
     }
+    return getal;
+}
+*/
+
+int min(int a, int b) {
+    int result = (a < b) ? a : b;
+    return result;
 }
 
 void geefKleur(char &kleur) {
@@ -136,8 +234,8 @@ int hoofdMenu(Othellobord & othellobord) {
     Bordvakje *ingang = NULL;
 
     do {
-        cout << "Kies uit: [s]toppen, [t]oevoegen, [l]ezen, [r]itsen  " << endl
-             << "          [a]fdrukken, [v]erwijderen" << endl
+        cout << "Kies uit: [s]toppen, [l]ezen, [r]itsen  " << endl
+             << "          [a]fdrukken" << endl
              << "Uw keuze: ";
         cin >> keuze;
         leegTerminal();
@@ -147,29 +245,19 @@ int hoofdMenu(Othellobord & othellobord) {
         case 'S':
             cout << "Dat was het dan ..." << endl;
             break;
-        case 't':
-        case 'T':
-            geefKleur(kleur);
-            Toevoegen(ingang, kleur);
-            Afdrukken(ingang);
-            break;
         case 'a':
         case 'A':
-            Afdrukken(ingang);
+            othellobord.afdrukken(ingang);
             break;
         case 'l':
         case 'L':
             geefIndex(index);
             cout << krijgKleur(ingang, index) << endl;
-        case 'v':
-        case 'V':
-            Verwijderen(ingang);
-            Afdrukken(ingang);
             break;
         case 'r':
         case 'R':
-            ingang = othellobord.ritsMap(0, 0, NULL);
-            Afdrukken(ingang);
+            ingang = othellobord.ritsMap();
+            othellobord.afdrukken(ingang);
             break;
         default:
             cout << "Niet toegestane menukeuze ..." << endl;
