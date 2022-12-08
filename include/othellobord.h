@@ -1,3 +1,8 @@
+struct Vec
+{
+    int x;
+    int y;
+};
 class Bordvakje {
   public:
     char kleur;           //     7 0 1
@@ -13,26 +18,23 @@ class Bordvakje {
 };//bordvakje
 
 
+
 class Othellobord {
   private:
     Bordvakje* ingang;
-    // TODO
-  public:
-    
-    // Variables
     int mapgrootte;
-
+  public:
     // Functions
-    void afdrukken(Bordvakje* ingang);
+    Vec krijgCoordinaten();
+    void afdrukken();
+    void zetPositie();
+    char krijgKleur();
+    Bordvakje* elementPtr(Vec);
+    void ritsMap();
 
-    Bordvakje* ritsMap();
-
-    
-    
-    
     // Constructor
     Othellobord() {
       mapgrootte = 8;
     }
-    // TODO
 };
+

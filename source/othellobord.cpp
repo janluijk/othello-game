@@ -1,8 +1,10 @@
 #include <iostream>
 #include <othellobord.h>
+#include <main.h>
+
 using namespace std;
 
-void Othellobord::afdrukken(Bordvakje *ingang) {
+void Othellobord::afdrukken() {
     Bordvakje* omlaagptr = ingang;
     Bordvakje* rechtsptr;
 
@@ -17,47 +19,89 @@ void Othellobord::afdrukken(Bordvakje *ingang) {
     }
 }
 
+Vec Othellobord::krijgCoordinaten() {
+    Vec position; 
+    cout << "Geef het eerste coordinaat (x) ";
+    position.x = krijgGetal();
+    cout << "Geef het tweede coordinaat (y) ";
+    position.y = krijgGetal();
+    return position;
+}
 
-// Acces nth element
-void Othellobord::getElementPtr(int pos_x, int pos_y, Bordvakje* ingang) {
+char Othellobord::krijgKleur() {
+    char kleur; 
+    kleur = krijgInvoer();
+    switch (kleur)
+    {
+    case 'w':
+    case 'W':
+        return 'w';
+        break;
+    case 'z':
+    case 'Z':
+        return 'z';
+        break;
+    default:
+        break;
+    }
+}
+
+void Othellobord::zetPositie() {
+    Vec positie;
+    Bordvakje* posPtr;
+    char kleur;
+
+    positie = krijgCoordinaten();
+    kleur   = krijgKleur();
+    posPtr  = elementPtr(positie);
+}
+
+Bordvakje* Othellobord::elementPtr(Vec pos) {
     
     int diagonaalStap; 
     int rechtStap;
     bool omlaag = false;
 
-    if(pos_x < pos_y) {
-        diagonaalStap = pos_x;
-        rechtStap = pos_y - pos_x;
+    if(pos.x < pos.y) {
+        diagonaalStap = pos.x;
+        rechtStap = pos.y - pos.x;
         omlaag = true;
     }
     else {
-        diagonaalStap = pos_y;
-        rechtStap = pos_x - pos_y;
+        diagonaalStap = pos.y;
+        rechtStap = pos.x - pos.y;
     }
 
-    Bordvakje* huidige;
+    Bordvakje* huidige = ingang;
 
     for (int i = 0; i < diagonaalStap; i++) {
         if(huidige) {
             huidige = huidige->buren[3];
         }
         else {
-            return 1;
+            return NULL;
         }
     }
     for (int i = 0; i < rechtStap; i++) {
         if(huidige) {
-            if() {
-
+            if(huidige) {
+                if(omlaag) {
+                    huidige = huidige->buren[4];
+                }
+                else {
+                    huidige = huidige->buren[2];
+                }
+            }
+            else {
+                return NULL;
             }
         }
     }
-    
+    return huidige;   
 }
 
-Bordvakje* Othellobord::ritsMap() {
-    
-    Bordvakje* hoofdIngang;
+void Othellobord::ritsMap() {
+
     Bordvakje* boven = new Bordvakje;
     
     for (int i = 0; i < mapgrootte; i++) {
@@ -70,7 +114,7 @@ Bordvakje* Othellobord::ritsMap() {
                 rijIngang = temp;
             }
             if (i == 0 && j == 0) {
-                hoofdIngang = temp;
+                ingang = temp;
             } 
 
             temp->buren[6] = vorige;
@@ -94,7 +138,4 @@ Bordvakje* Othellobord::ritsMap() {
         }
         boven = rijIngang->buren[6];
     }
-    return hoofdIngang;
 }
-
-

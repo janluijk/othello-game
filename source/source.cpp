@@ -1,7 +1,8 @@
 #include <iostream>
 #include <othellobord.h>
-using namespace std;
+#include <main.h>
 
+using namespace std;
 
 /*
 // Class
@@ -113,59 +114,6 @@ void infoBlokje() {
          << " " << endl;
 }
 
-// Returnt EERSTE karakter van invoer
-char leesInvoer() {
-    char input;
-
-    do { // Alle tabs en enters worden weggehaald
-        input = cin.get();
-    } while (input == '\n' || input == '\t');
-    return input;
-}
-
-// Leegt de invoerstream tot de eerstvolgende enter
-void leegInvoer() {
-    char input;
-
-    do {
-        input = cin.get();
-    } while (input != '\n');
-}
-
-*/
-/*
-// Returnt getal, leest alleen eerste getal!
-int leesGetal() {
-    char input;
-    int  getal    = 0;
-    int  decimaal = 0;
-
-    input = leesInvoer(); // eerste niet-enter
-    while(input < '0' || input > '9') { // zolang geen getal, verder zoeken
-        input = cin.get();
-    }
-    while(input >= '0' && input <= '9') { // zolang integer: maak getal van
-        decimaal = input - '0'; // converteren van karakter naar integer
-        getal = getal * 10 + decimaal;
-
-        input = cin.get();
-    }
-    return getal;
-}
-
-*/
-
-
-// Leegt de terminal, maakt alles mooier
-void leegTerminal() {
-    //std::system("CLS");
-
-    cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-         << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-         << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-}
-
-/*
 // Geeft een random getal
 int rng() {
     static int seed = 42;        // Static: seed wordt 1 keer geinitialiseerd
@@ -176,9 +124,8 @@ int rng() {
     return seed;
 }
 
-*/
+
 // Klemt waarde tussen een ondergrens en bovengrens en returnt deze
-/*
 int klem(int getal, int ondergrens, int bovengrens) {
     if (getal < ondergrens) {
         getal = ondergrens;
@@ -190,52 +137,13 @@ int klem(int getal, int ondergrens, int bovengrens) {
 }
 */
 
-int min(int a, int b) {
-    int result = (a < b) ? a : b;
-    return result;
-}
-
-void geefKleur(char &kleur) {
-    cout << "Geef een kleur op:";
-    cin >> kleur;
-}
-
-void geefIndex(int &index) {
-    char input;
-    cout << "Geef een index op: ";
-    cin >> input;
-    if( !(input < '0') && !(input > '9')) {
-        index = (int)(input - '0');
-    }
-    else {
-        index = 0;
-    }
-}
-
-char krijgKleur(Bordvakje *ingang, int index)
-{
-    Bordvakje *p = ingang; // pointertje om lijst mee door te lopen
-    int counter = 0;
-    while (p != nullptr) {
-        cout << p->kleur;
-        if(counter == index) {
-            return p->kleur;
-        }        
-        counter++;
-        p = p->buren[2];
-    } // while
-    return '-';
-}
 
 int hoofdMenu(Othellobord & othellobord) {
     char keuze;
-    char kleur;
-    int index;
-    Bordvakje *ingang = NULL;
 
     do {
         cout << "Kies uit: [s]toppen, [l]ezen, [r]itsen  " << endl
-             << "          [a]fdrukken" << endl
+             << "          [a]fdrukken, [z]etten" << endl
              << "Uw keuze: ";
         cin >> keuze;
         leegTerminal();
@@ -247,17 +155,15 @@ int hoofdMenu(Othellobord & othellobord) {
             break;
         case 'a':
         case 'A':
-            othellobord.afdrukken(ingang);
+            othellobord.afdrukken();
             break;
         case 'l':
         case 'L':
-            geefIndex(index);
-            cout << krijgKleur(ingang, index) << endl;
             break;
         case 'r':
         case 'R':
-            ingang = othellobord.ritsMap();
-            othellobord.afdrukken(ingang);
+            othellobord.ritsMap();
+            othellobord.afdrukken();
             break;
         default:
             cout << "Niet toegestane menukeuze ..." << endl;
@@ -270,7 +176,7 @@ int hoofdMenu(Othellobord & othellobord) {
 
 int main() {
     Othellobord othellobord;
-    
+
     hoofdMenu(othellobord);
     
     return 0;
