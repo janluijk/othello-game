@@ -1,32 +1,33 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "type": "shell",
-            "label": "C/C++: g++.exe build active file",
-            "command": "g++",
-            "args": [
-                "-std=c++11",
-                "-O2",
-                "-Wall",
-                "-g",
-                "${file}",
-                "-o",
-                "${workspaceFolder}/build/source.exe",
-                "${workspaceFolder}/source/*.cpp",
-                "-I",
-                "${workspaceFolder}/include"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "isDefault": true,
-                "kind": "build"
-            }
-        }
-    ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "C/C++: g++.exe build active file",
+			"command": "C:/msys64/mingw64/bin/g++.exe",
+			"args": [
+				"-fdiagnostics-color=always",
+				"-Wall",
+				"-o",
+				"${workspaceFolder}/build/source.exe", 
+				"${workspaceFolder}/source/source.cpp",
+				"-I",
+				"${workspaceFolder}/include",
+				"-L",
+				"${workspaceFolder}/lib", 
+				"--static",
+			],
+			"options": {
+				"cwd": "C:/msys64/mingw64/bin"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "compiler: C:/msys64/mingw64/bin/g++.exe"
+		}
+	]
 }

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "othellobord.h"
+#include <othellobord.h>
 using namespace std;
 
 
@@ -16,32 +16,36 @@ char leesInvoer() {
 // Leegt de terminal, maakt alles mooier
 void leegTerminal() {
     // std::system("CLS");
-
+    /*
     cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
          << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
          << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+    */
 }
 
 void Afdrukken(Bordvakje *ingang) {
-    Bordvakje *p = ingang; // pointertje om lijst mee door te lopen
-    while (p != nullptr) {
-        cout << " # " << p->kleur << " | ";
-        p = p->buren[2];
-    } // while
-    cout << endl;
-} // Afdrukken
+    Bordvakje* omlaagptr = ingang;
+    Bordvakje* rechtsptr;
 
-void Toevoegen(Bordvakje *&ingang, char kleur)
-{
-    Bordvakje *p; // hulppointertje
-    while(p != nullptr) {
-        p = p->buren[2];
+    while(omlaagptr) {
+        rechtsptr = omlaagptr;
+        while(rechtsptr) {
+            cout << (rechtsptr->kleur) << " | ";
+            rechtsptr = rechtsptr->buren[2];
+        }
+        cout << "\n";
+        omlaagptr = omlaagptr->buren[4];
     }
-    p = new Bordvakje;
-    p->kleur = kleur;
-    p->buren[2] = ingang;
-    ingang = p;
-} // Toevoegen
+}
+
+void Toevoegen (Bordvakje* & ingang, char kleur) {
+  Bordvakje* p;  // hulppointertje
+  p = new Bordvakje;
+
+  p->kleur = kleur;
+  p->buren[2] = ingang;
+  ingang = p;
+}
 
 void Verwijderen(Bordvakje *&ingang)
 {
@@ -52,11 +56,51 @@ void Verwijderen(Bordvakje *&ingang)
     }                         // if
 } // Verwijderen
 
+
+void Othellobord::ritsMap(int mapgrootte, Bordvakje* ingang) {
+    Bordvakje* hoofdIngang = NULL; 
+    Bordvakje* vorige, *boven = new Bordvakje;
+    
+    for (int i = 0; i < mapgrootte; i++) {
+        Bordvakje* rijIngang; //row-wise head of list.
+        Bordvakje *vorige = new Bordvakje; // dummy node to mark start of left pointer.
+        for (int j = 0; j < mapgrootte; j++) {
+            Bordvakje* temp = new Bordvakje;
+ 
+            if (j == 0) {
+                head_row = temp;
+            }
+            if (i == 0 && j == 0) {
+                head_main = temp;
+            } 
+
+            temp->buren[6] = vorige;
+            vorige->buren[2] = temp;
+            
+            if (i == mapgrootte - 1) temp->buren[4] = NULL;
+ 
+            //This is only used for 1st row.
+            if (!boven->buren[2]) {
+                boven->buren[2] = new Bordvakje;
+            }
+            boven = boven->buren[2];
+ 
+            temp->buren[0] = boven;
+            boven->buren[4] = temp;
+            vorige = temp;
+ 
+            if (j == mapgrootte - 1) {
+                vorige->buren[2] = NULL;
+            }
+        }
+        boven = rijIngang->buren[6];
+    }
+}
+
 void geefKleur(char &kleur) {
     cout << "Geef een kleur op:";
     cin >> kleur;
 }
-
 
 void geefIndex(int &index) {
     char input;
@@ -85,15 +129,14 @@ char krijgKleur(Bordvakje *ingang, int index)
     return '-';
 }
 
-int main() {
-
-    Bordvakje *ingang = nullptr; // ingang van de op te bouwen lijst (of NULL)
-    char keuze;              // wat wil de gebruiker?
+int hoofdMenu(Othellobord & othellobord) {
+    char keuze;
     char kleur;
     int index;
+    Bordvakje *ingang = NULL;
 
     do {
-        cout << "Kies uit: [s]toppen, [t]oevoegen, [l]ezen,  " << endl
+        cout << "Kies uit: [s]toppen, [t]oevoegen, [l]ezen, [r]itsen  " << endl
              << "          [a]fdrukken, [v]erwijderen" << endl
              << "Uw keuze: ";
         cin >> keuze;
@@ -123,14 +166,25 @@ int main() {
             Verwijderen(ingang);
             Afdrukken(ingang);
             break;
+        case 'r':
+        case 'R':
+            ingang = othellobord.ritsMap(0, 0, NULL);
+            Afdrukken(ingang);
+            break;
         default:
             cout << "Niet toegestane menukeuze ..." << endl;
         } // switch
     }     // do 
-
     while( !(keuze == 's') && !(keuze == 'S'));
 
+    return 1;
+}
 
+int main() {
+    Othellobord othellobord;
+    
+    hoofdMenu(othellobord);
+    
     return 0;
     
 }
