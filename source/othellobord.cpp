@@ -1,6 +1,6 @@
 #include <iostream>
-#include <othellobord.h>
-#include <main.h>
+#include "othellobord.h"
+#include "main.h"
 
 using namespace std;
 
@@ -8,6 +8,8 @@ void Othellobord::afdrukken() {
     Bordvakje* omlaagptr = ingang;
     Bordvakje* rechtsptr;
 
+
+ 
     while(omlaagptr) {
         rechtsptr = omlaagptr;
         while(rechtsptr) {
@@ -17,6 +19,7 @@ void Othellobord::afdrukken() {
         cout << "\n";
         omlaagptr = omlaagptr->buren[4];
     }
+    
 }
 
 Vec Othellobord::krijgCoordinaten() {
@@ -31,19 +34,25 @@ Vec Othellobord::krijgCoordinaten() {
 char Othellobord::krijgKleur() {
     char kleur; 
     kleur = krijgInvoer();
-    switch (kleur)
+    while (1)
     {
-    case 'w':
-    case 'W':
-        return 'w';
-        break;
-    case 'z':
-    case 'Z':
-        return 'z';
-        break;
-    default:
-        break;
+        switch (kleur)
+        {
+            case 'w':
+            case 'W':
+                return 'w';
+                break;
+            case 'z':
+            case 'Z':
+                return 'z';
+                break;
+            default:
+                cout << "Geef een juist karakter op svp" << endl;
+                break;
+        }
+
     }
+    
 }
 
 void Othellobord::zetPositie() {
@@ -54,13 +63,22 @@ void Othellobord::zetPositie() {
     positie = krijgCoordinaten();
     kleur   = krijgKleur();
     posPtr  = elementPtr(positie);
+    posPtr->kleur = kleur;
 }
+
+
+//  ┌─┬─┬─┐
+//  │x│x│x│
+//  └─┴─┴─┘
 
 Bordvakje* Othellobord::elementPtr(Vec pos) {
     
     int diagonaalStap; 
     int rechtStap;
     bool omlaag = false;
+
+    pos.x--; // Array start op 0, coordinaten start op 1!
+    pos.y--;
 
     if(pos.x < pos.y) {
         diagonaalStap = pos.x;
@@ -101,41 +119,87 @@ Bordvakje* Othellobord::elementPtr(Vec pos) {
 }
 
 void Othellobord::ritsMap() {
+    Bordvakje* rijIngang;
+    Bordvakje* boven;
+    Bordvakje* rechtsboven;
+    Bordvakje* linksboven;
+    Bordvakje* vorige;
 
-    Bordvakje* boven = new Bordvakje;
-    
     for (int i = 0; i < mapgrootte; i++) {
-        Bordvakje* rijIngang; //row-wise head of list.
-        Bordvakje *vorige = new Bordvakje; // dummy node to mark start of left pointer.
         for (int j = 0; j < mapgrootte; j++) {
+            
             Bordvakje* temp = new Bordvakje;
- 
-            if (j == 0) {
-                rijIngang = temp;
-            }
-            if (i == 0 && j == 0) {
+            
+            if(j == 0 && i == 0) {
                 ingang = temp;
-            } 
+                rijIngang = temp;
+                vorige = temp;
+                            
+                continue;
+            }
+
+            if(j == 0) {
+                rijIngang = temp;       
+                
+                temp->buren[0] = boven;
+                boven->buren[4] = temp;
+
+                temp->buren[1] = rechtsboven;
+                rechtsboven->buren[5] = temp;                
+                
+                vorige = temp;
+                linksboven = boven;
+                boven = rechtsboven;
+                rechtsboven = rechtsboven->buren[2];
+
+                continue;
+            }
+
+            if(i == 0) {
+                
+                temp->buren[6] = vorige;
+                vorige->buren[2] = temp;
+
+                vorige = temp;
+                continue;
+            }
+            
+            if(j == mapgrootte - 1) {
+                temp->buren[6] = vorige;
+                vorige->buren[2] = temp;
+                
+                temp->buren[7] = linksboven;
+                linksboven->buren[3] = temp;
+                
+                temp->buren[0] = boven;
+                boven->buren[4] = temp;
+
+                continue;
+            }
 
             temp->buren[6] = vorige;
             vorige->buren[2] = temp;
+
             
-            if (i == mapgrootte - 1) temp->buren[4] = NULL;
- 
-            //This is only used for 1st row.
-            if (!boven->buren[2]) {
-                boven->buren[2] = new Bordvakje;
-            }
-            boven = boven->buren[2];
- 
+            temp->buren[7] = linksboven;
+            linksboven->buren[3] = temp;
+
+            
             temp->buren[0] = boven;
             boven->buren[4] = temp;
+
+            temp->buren[1] = rechtsboven;
+            rechtsboven->buren[5] = temp;
+            
             vorige = temp;
- 
-            if (j == mapgrootte - 1) {
-                vorige->buren[2] = NULL;
-            }
+            linksboven = boven;
+            boven = rechtsboven;
+            rechtsboven = rechtsboven->buren[2];
         }
-        boven = rijIngang->buren[6];
+
+        boven = rijIngang;
+        rechtsboven = boven->buren[2];
+
+        cout << endl;
     }
 }
