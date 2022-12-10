@@ -36,12 +36,11 @@ char Othellobord::krijgKleur() {
     case 'w':
     case 'W':
         return 'w';
-        break;
     case 'z':
     case 'Z':
         return 'z';
-        break;
     default:
+    // cout
         break;
     }
 }
@@ -60,7 +59,7 @@ Bordvakje* Othellobord::elementPtr(Vec pos) {
     
     int diagonaalStap; 
     int rechtStap;
-    bool omlaag = false;
+    bool omlaag;
 
     if(pos.x < pos.y) {
         diagonaalStap = pos.x;

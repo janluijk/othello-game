@@ -17,8 +17,6 @@ class Bordvakje {
 
 };//bordvakje
 
-
-
 class Othellobord {
   private:
     Bordvakje* ingang;
