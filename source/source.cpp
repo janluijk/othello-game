@@ -8,11 +8,10 @@ int hoofdMenu(Othellobord & othellobord) {
     char keuze;
 
     do {
-        cout << "Kies uit: [s]toppen, [l]ezen, [r]itsen  " << endl
+        cout << "Kies uit: [s]toppen, " << endl
              << "          [a]fdrukken, [z]etten" << endl
              << "Uw keuze: ";
         cin >> keuze;
-        leegTerminal();
         switch (keuze)
         {
         case 's':
@@ -26,14 +25,11 @@ int hoofdMenu(Othellobord & othellobord) {
         case 'l':
         case 'L':
             break;
-        case 'r':
-        case 'R':
-            othellobord.ritsMap();
-            othellobord.afdrukken();
-            break;
         case 'z':
         case 'Z':
-            othellobord.zetPositie();
+            othellobord.krijgZet();
+            leegTerminal();
+            othellobord.afdrukken();
             break;
         default:
             cout << "Niet toegestane menukeuze ..." << endl;
@@ -50,5 +46,4 @@ int main() {
     hoofdMenu(othellobord);
     
     return 0;
-    
 }

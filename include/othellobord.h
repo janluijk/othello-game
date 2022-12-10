@@ -20,7 +20,7 @@ class Bordvakje {
 
 class Othellobord {
   private:
-
+    
     Bordvakje* ingang;
     
     // Variables
@@ -32,15 +32,31 @@ class Othellobord {
     
     // Functions
     Vec krijgCoordinaten();
-    void afdrukken();
-    void zetPositie();
     char krijgKleur();
+    void krijgZet();
+    
+    void afdrukken();
+    void doeZet(Vec, char);
     void ritsMap();
+    void isZetMogelijk(Vec, char, bool);
+    void trekLijn(int, int, char, Bordvakje*);
 
     // Constructor
     Othellobord() {
-      ritsMap();
       mapgrootte = 8;
+      ritsMap();
+      
+      doeZet((Vec){4, 4} ,'z');
+      doeZet((Vec){4, 5} ,'w');
+      doeZet((Vec){5, 5} ,'z');
+      doeZet((Vec){5, 4} ,'w');
+      
+      /*
+      doeZet((Vec){5, 5} ,'z');
+      doeZet((Vec){5, 4} ,'w');
+      doeZet((Vec){5, 3} ,'w');
+      doeZet((Vec){5, 2} ,'w');
+      */
     }
 };
 
