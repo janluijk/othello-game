@@ -1,6 +1,5 @@
 #include <iostream>
-#include "othellobord.h"
-#include "main.h"
+#include <othellobord.h>
 
 using namespace std;
 // Private
@@ -51,16 +50,15 @@ Bordvakje* Othellobord::elementPtr(Vec2 pos) {
     return huidige;   
 }
 
-// Zal waarschijnlijk niet werken bij elementen uit eerste kolom naar rechtsboven!
 void Othellobord::ritsMap() {
-    Bordvakje* rijIngang;
+    Bordvakje* rijIngang = nullptr;
     Bordvakje* boven = nullptr;
     Bordvakje* rechtsboven = nullptr;
     Bordvakje* linksboven = nullptr;
     Bordvakje* vorige = nullptr;
 
-    for (int i = 0; i < mapgrootte; i++) {
-        for (int j = 0; j < mapgrootte; j++) {
+    for (int i = 0; i < Hoogte; i++) {
+        for (int j = 0; j < Lengte; j++) {
 
             Bordvakje* temp = new Bordvakje; // Nieuw vakje wordt aangemaakt
 
@@ -102,14 +100,11 @@ void Othellobord::ritsMap() {
                 }
             }
         } // Na iedere rij:
-
         vorige = nullptr;
         boven = rijIngang;
         rechtsboven = boven->buren[2];
     }
 }
-
-
 
 // Public
 void Othellobord::afdrukken() {
@@ -129,6 +124,21 @@ void Othellobord::afdrukken() {
     }
     
 }
+void Othellobord::zetSteen(Vec2 positie, char kleur) {
+    Bordvakje* posPtr;
+    posPtr  = elementPtr(positie);
+    
+    posPtr->kleur = kleur;
+}
+void Othellobord::trekLijn(int richting, int counter, char kleur, Bordvakje* huidig) {
+    int terug = (richting + 4) % 8;
+    for (int i2 = 0; i2 < counter; i2++) {
+        huidig->kleur = kleur;
+        huidig = huidig->buren[terug];
+    }
+
+}
+
 
 Vec2 Othellobord::krijgCoordinaten() {
     Vec2 position; 
@@ -176,29 +186,31 @@ char Othellobord::krijgKleur() {
 void Othellobord::krijgZet() {
     Vec2 positie;
     char kleur;
-    bool zetSteen = true;
+    bool doeZet = true;
 
     positie = krijgCoordinaten();
     kleur   = krijgKleur();
-    zetSteen(positie, kleur);
-    isZetMogelijk(positie, kleur, zetSteen);
+    isZetMogelijk(positie, kleur, doeZet);
 }
 
-void Othellobord::zetSteen(Vec2 positie, char kleur) {
-    Bordvakje* posPtr;
-    posPtr  = elementPtr(positie);
-    
-    posPtr->kleur = kleur;
-}
-bool Othellobord::isZetMogelijk(Vec2 positie, char kleur, bool zetSteen = false) {
+
+bool Othellobord::isZetMogelijk(Vec2 positie, char kleur, bool doeZet = false) {
     Bordvakje* vakPtr = elementPtr(positie); // Pointer naar vakje wordt nog opgeslagen
     Bordvakje* huidig = vakPtr; 
     char kleurVijand;
     char huidigKleur;
     int counter = 0;
 
+    if(kleur == 'z') {
+        kleurVijand = 'w';
+    }
+    if(kleur == 'w') {
+        kleurVijand = 'z';
+    }
+
     for (int richting = 0; richting < 8; richting++) {
         counter = 0;
+
         if(!huidig->buren[richting]) {
             continue;
         }
@@ -216,13 +228,11 @@ bool Othellobord::isZetMogelijk(Vec2 positie, char kleur, bool zetSteen = false)
         if(huidigKleur == kleur && counter) {
             // Zet is mogelijk
             // Op een of andere manier de zet opslaan
-            
-            if(zetSteen) {
+            if(doeZet) {
                 trekLijn(richting, counter, kleur, huidig);
+                
             }
-            else {
-                return true;
-            }
+            return true;
         }
         else {
             cout << "test" << endl;
@@ -231,18 +241,14 @@ bool Othellobord::isZetMogelijk(Vec2 positie, char kleur, bool zetSteen = false)
             }
             continue;
         }
-    }
-}
-void Othellobord::trekLijn(int richting, int counter, char kleur, Bordvakje* huidig) {
-    int terug = (richting + 4) % 8;
-    for (int i2 = 0; i2 < counter; i2++) {
-        huidig->kleur = kleur;
-        huidig = huidig->buren[terug];
-    }
 
+    }
+    return false;
 }
 
 // Structuur minmax:
+
+/*
 void Othellobord::kopieerMap();
 void Othellobord::gaZettenAf() {
     
@@ -261,3 +267,4 @@ void Othellobord::gaZettenAf() {
     }
     
 }
+*/

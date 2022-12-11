@@ -1,13 +1,14 @@
-struct Vec2
+
+// Structs
+typedef struct
 {
     int x;
     int y;
-};
+}Vec2;
 
+// Krijg
 char krijgInvoer();
 int krijgGetal();
-
-int kopieerMap(Othellobord &, Othellobord &);
+// Util
 void leegTerminal();
-
 int min(int, int);

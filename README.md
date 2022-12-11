@@ -3,8 +3,6 @@ g++ -std=c++11 -O2 -Wall -o build/othello.exe source/*.cpp -I include && build/s
 
 -- TODO --
   - Maken van een constructor en destructor
-  - Zetten mapgrootte
-    - Beginschijven ongeveer in het midden
   - Keuze tussen: PvP, PvBot, BotvBot
     - Beide bots -> statistieken
       - Meer dan 1 potje, niet afdrukken

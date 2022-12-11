@@ -1,26 +1,26 @@
-//#include <main.h>
+#include <main.h>
 
-
-Vec2 a = Vec2{5, 6};
-
-class Bordvakje {
+class Bordvakje 
+{
   public:
     char kleur;           //     7 0 1
     Bordvakje* buren[8];  //     6   2
-    Bordvakje() {         //     5 4 3
+    Bordvakje()           //     5 4 3
+    {         
       kleur = '.';
-      for (int i = 0; i < 8; i++)
-      {
+      for (int i = 0; i < 8; i++) {
         buren[i] = nullptr;
       }
+
     }
+    ~Bordvakje() {}
 
 };//bordvakje
 
-class Othellobord {
+class Othellobord 
+{
   private:
     // Variables
-    int mapgrootte;
     Bordvakje* ingang;
     
     // Functions
@@ -50,21 +50,25 @@ class Othellobord {
     void afdrukken();
     void zetSteen(Vec2, char);
     void maakKopie(Bordvakje* ingang, Othellobord & kopie);
-
+      
     // Constructor
     Othellobord(int lengte = 8, int hoogte = 8, char speler = 0, int vervolgpartijen = 0) {
       Lengte = lengte;
       Hoogte = hoogte;
       Speler = speler;
       Vervolgpartijen = vervolgpartijen;
-      
+
       ritsMap();
 
       // Startpositie
-      zetSteen((struct Vec2){Lengte/2,Hoogte/2},'w');
-      zetSteen((struct Vec2){Lengte/2 + 1, Hoogte/2} ,'z');
-      zetSteen((struct Vec2){Lengte/2, Hoogte/2 + 1} ,'z');
-      zetSteen((struct Vec2){Lengte/2 + 1, Hoogte/2 + 1} ,'w');
+      Vec2 startpositie = {Lengte/2, Hoogte/2};
+      zetSteen(startpositie,'w');
+      startpositie.x++;
+      zetSteen(startpositie ,'z');
+      startpositie.y++;
+      zetSteen(startpositie ,'w');
+      startpositie.x--;
+      zetSteen(startpositie ,'z');
     }
 };
 

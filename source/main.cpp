@@ -1,9 +1,8 @@
 #include <iostream>
-#include <main.h>
 #include <othellobord.h>
 using namespace std;
 
-// Returnt EERSTE karakter van invoer
+// Krijg
 char krijgInvoer() {
     char input;
 
@@ -12,8 +11,6 @@ char krijgInvoer() {
     } while (input == '\n' || input == '\t');
     return input;
 }
-
-// Returnt getal, leest alleen eerste getal!
 int krijgGetal() {
     char input;
     int  getal    = 0;
@@ -31,8 +28,59 @@ int krijgGetal() {
     }
     return getal;
 }
+bool krijgParameters(int& lengte, int& hoogte, int& speler, int& vervolgpartijen) {
+    char keuze;
 
-// Leegt de terminal, maakt alles mooier
+    cout << "Wie spelen er? Wit wordt gespeeld door een: \n[Persoon], [Computer] \n:  ";
+    keuze = krijgInvoer();
+    
+    switch (keuze)
+    {
+    case 'p':
+    case 'P':
+        break;
+    case 'c':
+    case 'C':
+        speler++;
+        break;
+    default:
+        cout << "Geen geldige waarde opgegeven, het spel zal starten met de standaardwaarden!" << endl;
+        return false;
+    }
+
+    cout << "\nZwart wordt gespeeld door een: \n[Persoon], [Computer], \n:  ";
+    keuze = krijgInvoer();
+
+    switch (keuze)
+    {
+    case 'p':
+    case 'P':
+        break;
+    case 'c':
+    case 'C':
+        speler++;
+        break;
+    default:
+        cout << "Geen geldige waarde opgegeven, het spel zal starten met de standaardwaarden!" << endl;
+        return false;
+    }
+    
+    cout << "Stel nu de mapgrootte in: \nDe lengte van de map wordt: \n: ";
+    lengte = krijgGetal();
+    cout << "\n De hoogte van de map wordt: \n: ";
+    hoogte = krijgGetal();
+
+    vervolgpartijen = 0;
+
+    if(speler == 2) {
+        cout << "Hoeveel vervolgpartijen wil je spelen? \n: ";
+        vervolgpartijen = krijgGetal();
+    }
+
+    return true; 
+}
+
+// Util
 void leegTerminal() {
     //std::system("CLS");
 
@@ -40,74 +88,12 @@ void leegTerminal() {
          << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
          << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 }
-
 int min(int a, int b) {
     int result = (a < b) ? a : b;
     return result;
 }
 
-void krijgParameters(Othellobord & othellobord, Othellobord & kopie) {
-    char keuze;
-    int lengte, hoogte;
-
-    while(1) {
-        cout << "Wie spelen er? Wit wordt gespeeld door een: \n [Persoon], [Computer], [S]toppen \n :  " << endl;
-        keuze = krijgInvoer();
-        
-        switch (keuze)
-        {
-        case 'S':
-        case 's':
-            cout << "Het spel stopt! " << endl;
-            return;
-        case 'p':
-        case 'P':
-            continue;
-        case 'c':
-        case 'C':
-            othellobord.Speler++;
-            continue;
-        default:
-            cout << "Niet toegestane menukeuze ..." << endl;
-        } 
-    }
-    while(1) {
-        cout << "\n Zwart wordt gespeeld door een: \n [Persoon], [Computer], [S]toppen \n :  " << endl;
-        keuze = krijgInvoer();
-
-        switch (keuze)
-        {
-        case 'S':
-        case 's':
-            cout << "Het spel stopt! " << endl;
-            return;
-        case 'p':
-        case 'P':
-            break;
-        case 'c':
-        case 'C':
-            othellobord.Speler++;
-            break;
-        default:
-            cout << "Niet toegestane menukeuze ..." << endl;
-        } 
-    }
-    
-    cout << "Stel nu de mapgrootte in: \n De lengte van de map wordt: \n : " << endl;
-    lengte = krijgGetal();
-    cout << "\n De hoogte van de map wordt: \n : " << endl;
-    hoogte = krijgGetal();
-
-    if(othellobord.Speler == 2) {
-        int vervolgpartijen;
-
-        cout << "Hoeveel vervolgpartijen wil je spelen? \n :  " << endl;
-        vervolgpartijen = krijgGetal();
-        
-    }
-    return;
-}
-
+// Menu
 int hoofdMenu(Othellobord & othellobord) {
     char keuze;
     do {
@@ -144,11 +130,23 @@ int hoofdMenu(Othellobord & othellobord) {
 }
 
 int main() {
-    Othellobord othellobord;
-    Othellobord kopie;
+    int lengte;
+    int hoogte;
+    int speler;
+    int vervolgpartijen;
+    vervolgpartijen = 5;
 
-    krijgParameters(othellobord, kopie);
-    hoofdMenu(othellobord);
+    if(krijgParameters(lengte, hoogte, speler, vervolgpartijen)) {
+        Othellobord othellobord(lengte, hoogte, speler, vervolgpartijen);
+        Othellobord kopie(lengte, hoogte, speler, vervolgpartijen);
+        hoofdMenu(othellobord);
+    }
+    else {
+        Othellobord othellobord;
+        Othellobord kopie;
+        hoofdMenu(othellobord);
+    }
+    
     
     return 0;
 }
