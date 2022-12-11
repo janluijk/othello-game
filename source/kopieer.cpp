@@ -1,43 +1,7 @@
 #include <iostream>
-#include <othellobord.h>
 #include <main.h>
+#include <othellobord.h>
 
-using namespace std;
-
-int hoofdMenu(Othellobord & othellobord) {
-    char keuze;
-    do {
-        cout << "Kies uit: [s]toppen, " << endl
-             << "          [a]fdrukken, [z]etten" << endl
-             << "Uw keuze: ";
-        cin >> keuze;
-        switch (keuze)
-        {
-        case 's':
-        case 'S':
-            cout << "Dat was het dan ..." << endl;
-            break;
-        case 'a':
-        case 'A':
-            othellobord.afdrukken();
-            break;
-        case 'l':
-        case 'L':
-            break;
-        case 'z':
-        case 'Z':
-            othellobord.krijgZet();
-            leegTerminal();
-            othellobord.afdrukken();
-            break;
-        default:
-            cout << "Niet toegestane menukeuze ..." << endl;
-        } // switch
-    }     // do 
-    while( !(keuze == 's') && !(keuze == 'S'));
-
-    return 1;
-}
 
 int kopieerMap(Othellobord &othellobord, Othellobord &kopie) {
     Bordvakje* othIngang   = othellobord.elementPtr( (Vec) {1, 1} );
@@ -60,7 +24,9 @@ int kopieerMap(Othellobord &othellobord, Othellobord &kopie) {
         othOmlaagptr = othOmlaagptr->buren[4];
         kopieOmlaagptr = kopieOmlaagptr->buren[4];
     }
+
 }
+
 
 void gaZettenAf(char kleur, Othellobord & othellobord, Othellobord & kopie) {
     Vec positie = {0, 0};
@@ -75,13 +41,4 @@ void gaZettenAf(char kleur, Othellobord & othellobord, Othellobord & kopie) {
             }   
         }   
     }
-}
-
-int main() {
-    Othellobord othellobord;
-    Othellobord kopie;
-
-    hoofdMenu(othellobord);
-    
-    return 0;
 }

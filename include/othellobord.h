@@ -1,8 +1,7 @@
-struct Vec
-{
-    int x;
-    int y;
-};
+//#include <main.h>
+
+
+Vec2 a = Vec2{5, 6};
 
 class Bordvakje {
   public:
@@ -20,43 +19,52 @@ class Bordvakje {
 
 class Othellobord {
   private:
-    
-    Bordvakje* ingang;
-    
     // Variables
     int mapgrootte;
-
-    // Functions
-    Bordvakje* elementPtr(Vec);
-  public:
+    Bordvakje* ingang;
     
     // Functions
-    Vec krijgCoordinaten();
+    Bordvakje* elementPtr(Vec2);
+    void trekLijn(int, int, char, Bordvakje*);
+    void ritsMap();
+
+  public:
+    // Variablen
+    int Lengte;
+    int Hoogte;
+    char Speler; // 0 = player v player, 1 = player v bot, 2 = bot v bot
+    
+    int Vervolgpartijen;
+    
+    // Functions
+    Vec2 krijgCoordinaten(); // Van speler gevraagd:
     char krijgKleur();
     void krijgZet();
-    
+
+    void gaZettenAf();
+    void kopieerMap();
+    void evalueerZet();
+
+
+    bool isZetMogelijk(Vec2, char, bool); // Als bool waar: zet wordt meteen uitgevoerd.
     void afdrukken();
-    void doeZet(Vec, char);
-    void ritsMap();
-    void isZetMogelijk(Vec, char, bool);
-    void trekLijn(int, int, char, Bordvakje*);
+    void zetSteen(Vec2, char);
+    void maakKopie(Bordvakje* ingang, Othellobord & kopie);
 
     // Constructor
-    Othellobord() {
-      mapgrootte = 8;
+    Othellobord(int lengte = 8, int hoogte = 8, char speler = 0, int vervolgpartijen = 0) {
+      Lengte = lengte;
+      Hoogte = hoogte;
+      Speler = speler;
+      Vervolgpartijen = vervolgpartijen;
+      
       ritsMap();
-      
-      doeZet((Vec){4, 4} ,'z');
-      doeZet((Vec){4, 5} ,'w');
-      doeZet((Vec){5, 5} ,'z');
-      doeZet((Vec){5, 4} ,'w');
-      
-      /*
-      doeZet((Vec){5, 5} ,'z');
-      doeZet((Vec){5, 4} ,'w');
-      doeZet((Vec){5, 3} ,'w');
-      doeZet((Vec){5, 2} ,'w');
-      */
+
+      // Startpositie
+      zetSteen((struct Vec2){Lengte/2,Hoogte/2},'w');
+      zetSteen((struct Vec2){Lengte/2 + 1, Hoogte/2} ,'z');
+      zetSteen((struct Vec2){Lengte/2, Hoogte/2 + 1} ,'z');
+      zetSteen((struct Vec2){Lengte/2 + 1, Hoogte/2 + 1} ,'w');
     }
 };
 
