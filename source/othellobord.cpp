@@ -49,7 +49,6 @@ Bordvakje* Othellobord::elementPtr(Vec2 pos) {
     }
     return huidige;   
 }
-
 void Othellobord::ritsMap() {
     Bordvakje* rijIngang = nullptr;
     Bordvakje* boven = nullptr;
@@ -105,13 +104,19 @@ void Othellobord::ritsMap() {
         rechtsboven = boven->buren[2];
     }
 }
+void Othellobord::trekLijn(int richting, int counter, char kleur, Bordvakje* huidig) {
+    int terug = (richting + 4) % 8;
+    for (int i2 = 0; i2 < counter; i2++) {
+        huidig->kleur = kleur;
+        huidig = huidig->buren[terug];
+    }
+
+}
 
 // Public
 void Othellobord::afdrukken() {
     Bordvakje* omlaagptr = ingang;
     Bordvakje* rechtsptr;
-
-
  
     while(omlaagptr) {
         rechtsptr = omlaagptr;
@@ -122,7 +127,6 @@ void Othellobord::afdrukken() {
         cout << "\n";
         omlaagptr = omlaagptr->buren[4];
     }
-    
 }
 void Othellobord::zetSteen(Vec2 positie, char kleur) {
     Bordvakje* posPtr;
@@ -130,15 +134,14 @@ void Othellobord::zetSteen(Vec2 positie, char kleur) {
     
     posPtr->kleur = kleur;
 }
-void Othellobord::trekLijn(int richting, int counter, char kleur, Bordvakje* huidig) {
-    int terug = (richting + 4) % 8;
-    for (int i2 = 0; i2 < counter; i2++) {
-        huidig->kleur = kleur;
-        huidig = huidig->buren[terug];
+void Othellobord::volgendeBeurt() {
+    if(beurt == 'z') {
+        beurt = 'w';
+        return;
     }
-
+    beurt = 'z';
+    return;
 }
-
 
 Vec2 Othellobord::krijgCoordinaten() {
     Vec2 position; 
@@ -185,14 +188,14 @@ char Othellobord::krijgKleur() {
 }
 void Othellobord::krijgZet() {
     Vec2 positie;
-    char kleur;
+    char kleur = beurt;
     bool doeZet = true;
 
     positie = krijgCoordinaten();
-    kleur   = krijgKleur();
-    isZetMogelijk(positie, kleur, doeZet);
+    if(!isZetMogelijk(positie, kleur, doeZet)) {
+        cout << "Zet is niet mogelijk!" << endl;
+    }
 }
-
 
 bool Othellobord::isZetMogelijk(Vec2 positie, char kleur, bool doeZet = false) {
     Bordvakje* vakPtr = elementPtr(positie); // Pointer naar vakje wordt nog opgeslagen
@@ -200,12 +203,17 @@ bool Othellobord::isZetMogelijk(Vec2 positie, char kleur, bool doeZet = false) {
     char kleurVijand;
     char huidigKleur;
     int counter = 0;
+    bool zetIsMogelijk = false;
 
     if(kleur == 'z') {
         kleurVijand = 'w';
     }
     if(kleur == 'w') {
         kleurVijand = 'z';
+    }
+
+    if(vakPtr->kleur == kleur || vakPtr->kleur == kleurVijand) {
+        return zetIsMogelijk;
     }
 
     for (int richting = 0; richting < 8; richting++) {
@@ -219,32 +227,61 @@ bool Othellobord::isZetMogelijk(Vec2 positie, char kleur, bool doeZet = false) {
         
         while(huidigKleur == kleurVijand) {
             counter++;
-            cout << counter << endl;
 
             huidig = huidig->buren[richting];    
             huidigKleur = huidig->buren[richting]->kleur;
         }
 
         if(huidigKleur == kleur && counter) {
-            // Zet is mogelijk
-            // Op een of andere manier de zet opslaan
+            zetIsMogelijk = true;
             if(doeZet) {
+                zetSteen(positie, kleur);
                 trekLijn(richting, counter, kleur, huidig);
-                
             }
-            return true;
         }
         else {
-            cout << "test" << endl;
             if(counter) {
                 huidig = vakPtr;
             }
-            continue;
         }
 
     }
-    return false;
+    if(zetIsMogelijk) {
+        volgendeBeurt();
+    }
+    
+    return zetIsMogelijk;
 }
+
+
+int Othellobord::gaZettenAf(Othellobord& kopie, int zetten = 0) {
+    Vec2 huidig;
+    int aantalZetten = 0;
+    int aantalIteraties = 3;
+    int maxIteraties = 3;
+    char huidigSpeler = beurt;
+
+    for (int y = 0; y < Hoogte; y++) {
+        huidig.y = y; 
+        for (int x = 0; x < Lengte; x++) {
+            // nkopieerMap();
+            if(kopie.isZetMogelijk(huidig, beurt, true)) {
+                volgendeBeurt();
+                aantalZetten++;
+                if(aantalIteraties == maxIteraties) {
+                    
+                    return aantalZetten;
+                }
+                else {
+                    //aantalZetten = gaZettenAf();
+
+
+                }
+            }
+        }
+    }
+}
+
 
 // Structuur minmax:
 

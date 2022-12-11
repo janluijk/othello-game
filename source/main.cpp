@@ -96,8 +96,11 @@ int min(int a, int b) {
 // Menu
 int hoofdMenu(Othellobord & othellobord) {
     char keuze;
+    leegTerminal();
+    
     do {
-        cout << "Kies uit: [s]toppen, " << endl
+        othellobord.afdrukken();
+        cout << "Kies uit: [s]toppen, [t]el mogelijke zetten" << endl
              << "          [a]fdrukken, [z]etten" << endl
              << "Uw keuze: ";
         cin >> keuze;
@@ -114,11 +117,14 @@ int hoofdMenu(Othellobord & othellobord) {
         case 'l':
         case 'L':
             break;
+        case 't':
+        case 'T':
+            //othellobord.gaZettenAf(); 
+            break;
         case 'z':
         case 'Z':
             othellobord.krijgZet();
             leegTerminal();
-            othellobord.afdrukken();
             break;
         default:
             cout << "Niet toegestane menukeuze ..." << endl;

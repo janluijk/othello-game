@@ -33,17 +33,21 @@ class Othellobord
     int Lengte;
     int Hoogte;
     char Speler; // 0 = player v player, 1 = player v bot, 2 = bot v bot
-    
     int Vervolgpartijen;
+    
+    char beurt;
+    
+    
     
     // Functions
     Vec2 krijgCoordinaten(); // Van speler gevraagd:
     char krijgKleur();
     void krijgZet();
 
-    void gaZettenAf();
+    int gaZettenAf(Othellobord &, int);
     void kopieerMap();
     void evalueerZet();
+    void volgendeBeurt();
 
 
     bool isZetMogelijk(Vec2, char, bool); // Als bool waar: zet wordt meteen uitgevoerd.
@@ -57,6 +61,8 @@ class Othellobord
       Hoogte = hoogte;
       Speler = speler;
       Vervolgpartijen = vervolgpartijen;
+
+      beurt = 'z';
 
       ritsMap();
 
