@@ -1,5 +1,5 @@
 Compile command:
-g++ -std=c++11 -O2 -Wall -o build/othello.exe source/*.cpp -I include && build/source.exe 
+g++ -std=c++11 -O2 -Wall -o build/othello.exe source/*.cpp -I include && build/othello.exe 
 
 -- TODO --
   - Maken van een constructor en destructor
