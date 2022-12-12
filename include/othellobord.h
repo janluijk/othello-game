@@ -5,8 +5,13 @@ class Bordvakje
   public:
     char kleur;           //     7 0 1
     Bordvakje* buren[8];  //     6   2
-    Bordvakje();
-    ~Bordvakje();
+    Bordvakje() {
+      kleur = '.';
+      for (int i = 0; i < 8; i++) {
+        buren[i] = nullptr;
+      }
+    }
+    //~Bordvakje();
 
 };//bordvakje
 
@@ -59,7 +64,27 @@ class Othellobord
     void verwijderen();
 
     // Constructor
-    Othellobord(int = 8, int = 8, char = 'z', int = 0);
+    Othellobord(int lengte = 8, int hoogte = 8, char speler = 'z', int vervolgpartijen = 0) {
+      Lengte = lengte;
+      Hoogte = hoogte;
+      Speler = speler;
+      Vervolgpartijen = vervolgpartijen;
+
+      Beurt = 'z';
+      BeurtTegenstander = 'w';
+
+      ritsMap();
+
+      // Startpositie (Kan dit beter?)
+      Vec2 startpositie = {Lengte/2, Hoogte/2};
+      zetSteen(startpositie,'w');
+      startpositie.x++;
+      zetSteen(startpositie ,'z');
+      startpositie.y++;
+      zetSteen(startpositie ,'w');
+      startpositie.x--;
+      zetSteen(startpositie ,'z');
+    }
     // Destructor
-    ~Othellobord();
+    //~Othellobord();
 };
