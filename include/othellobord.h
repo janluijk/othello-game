@@ -63,4 +63,3 @@ class Othellobord
     // Destructor
     ~Othellobord();
 };
-
