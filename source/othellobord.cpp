@@ -2,8 +2,8 @@
 #include <othellobord.h>
 
 using namespace std;
-// Private
-Bordvakje* Othellobord::elementPtr(Vec2 pos) {
+// Converteert positie naar pointer
+Bordvakje* Othellobord::elementPtr(Vec2 pos) { 
     
     int diagonaalStap; 
     int rechtStap;
@@ -12,6 +12,8 @@ Bordvakje* Othellobord::elementPtr(Vec2 pos) {
     pos.x--; // Array start op 0, coordinaten start op 1!
     pos.y--;
 
+    // Er wordt hier wat meer moeite gedaan om in MINIMALE aantal zetten
+    // bij bestemming te komen
     if(pos.x < pos.y) {
         diagonaalStap = pos.x;
         rechtStap = pos.y - pos.x;
@@ -49,6 +51,7 @@ Bordvakje* Othellobord::elementPtr(Vec2 pos) {
     }
     return huidige;   
 }
+// Ritst de  hele map aan elkaar (in 1 functie)
 void Othellobord::ritsMap() {
     Bordvakje* rijIngang = nullptr;
     Bordvakje* boven = nullptr;
@@ -104,6 +107,7 @@ void Othellobord::ritsMap() {
         rechtsboven = boven->buren[2];
     }
 }
+// Keert stenen tussen begin en eindpunt om
 void Othellobord::trekLijn(int richting, int counter, char kleur, Bordvakje* huidig) {
     int terug = (richting + 4) % 8;
     for (int i2 = 0; i2 < counter; i2++) {
@@ -112,37 +116,73 @@ void Othellobord::trekLijn(int richting, int counter, char kleur, Bordvakje* hui
     }
 
 }
+// Voert zet daadwerkelijk uit
+void Othellobord::speelZet(Vec2 pos, char kleur, int richting, int stappen, Bordvakje* huidigPtr) {
+    zetSteen(pos, kleur);
+    trekLijn(richting, stappen, kleur, huidigPtr);
+}
 
-// Public
+// --- Public ---
+// Drukt map af
 void Othellobord::afdrukken() {
-    Bordvakje* omlaagptr = ingang;
-    Bordvakje* rechtsptr;
+    Bordvakje* omlaag = ingang;
+    Bordvakje* rechts;
  
-    while(omlaagptr) {
-        rechtsptr = omlaagptr;
-        while(rechtsptr) {
-            cout << (rechtsptr->kleur) << " | ";
-            rechtsptr = rechtsptr->buren[2];
+    while(omlaag) {
+        rechts = omlaag;
+        while(rechts) {
+            cout << (rechts->kleur) << " | ";
+            rechts = rechts->buren[2];
         }
         cout << "\n";
-        omlaagptr = omlaagptr->buren[4];
+        omlaag = omlaag->buren[4];
     }
 }
+// Functie om enkel een steen te plaatsen (beginpositie)
 void Othellobord::zetSteen(Vec2 positie, char kleur) {
     Bordvakje* posPtr;
     posPtr  = elementPtr(positie);
     
     posPtr->kleur = kleur;
 }
-void Othellobord::volgendeBeurt() {
-    if(beurt == 'z') {
-        beurt = 'w';
+// Draait beurten om
+void Othellobord::draaiBeurt() {
+    if(Beurt == 'z') {
+        Beurt = 'w';
+        BeurtTegenstander = 'z';
         return;
     }
-    beurt = 'z';
+    Beurt = 'z';
+    BeurtTegenstander = 'w';
+
     return;
 }
+// Maakt totale kopie van map
+void Othellobord::maakKopie(Othellobord & kopie) {
+    Bordvakje* omlaag = ingang; // Functie is zelfde als afdrukken() maar kopieert waarden
+    Bordvakje* rechts;
 
+    // is er een manier om vec2 meteen in argument van functie te initialiseren?
+    Vec2 begin = {1, 1};
+    Bordvakje* kopieOmlaag = kopie.elementPtr(begin);
+    Bordvakje* kopieRechts;
+    
+    while(omlaag) {
+        rechts = omlaag;
+        kopieRechts = kopieOmlaag; 
+        while(rechts) {
+
+            kopieRechts->kleur = rechts->kleur;
+
+            rechts = rechts->buren[2];
+            kopieRechts = kopieRechts->buren[2];
+        }
+        omlaag = omlaag->buren[4];
+        kopieOmlaag = kopieOmlaag->buren[4];
+    }
+}
+
+// Verkrijgen van data van speler:
 Vec2 Othellobord::krijgCoordinaten() {
     Vec2 position; 
     cout << "Geef het eerste coordinaat (x) ";
@@ -188,120 +228,291 @@ char Othellobord::krijgKleur() {
 }
 void Othellobord::krijgZet() {
     Vec2 positie;
-    char kleur = beurt;
+    char kleur = Beurt;
     bool doeZet = true;
 
     positie = krijgCoordinaten();
     if(!isZetMogelijk(positie, kleur, doeZet)) {
         cout << "Zet is niet mogelijk!" << endl;
     }
+    else {
+        draaiBeurt();
+    }
 }
 
+// Checkt of zet mag en laatste variable beslist of deze zet meteen wordt gezet
 bool Othellobord::isZetMogelijk(Vec2 positie, char kleur, bool doeZet = false) {
     Bordvakje* vakPtr = elementPtr(positie); // Pointer naar vakje wordt nog opgeslagen
     Bordvakje* huidig = vakPtr; 
-    char kleurVijand;
+    char kleurVijand = 'z';
     char huidigKleur;
-    int counter = 0;
+    int stappen = 0;
     bool zetIsMogelijk = false;
+    bool uitWhileLoop = false;
 
     if(kleur == 'z') {
         kleurVijand = 'w';
-    }
-    if(kleur == 'w') {
-        kleurVijand = 'z';
     }
 
     if(vakPtr->kleur == kleur || vakPtr->kleur == kleurVijand) {
         return zetIsMogelijk;
     }
-
     for (int richting = 0; richting < 8; richting++) {
-        counter = 0;
+        stappen = 0;
 
-        if(!huidig->buren[richting]) {
+        if(!(huidig->buren[richting])) {
+            continue;
+        }
+        huidigKleur = huidig->buren[richting]->kleur;
+
+        while(huidigKleur == kleurVijand) {
+            stappen++;
+            
+            huidig = huidig->buren[richting];
+            
+            if(!(huidig->buren[richting])) {
+                huidig = vakPtr;
+                richting++;
+                break;
+            } 
+            huidigKleur = huidig->buren[richting]->kleur;
+        }
+        if(uitWhileLoop) {
             continue;
         }
 
-        huidigKleur = huidig->buren[richting]->kleur;
-        
-        while(huidigKleur == kleurVijand) {
-            counter++;
-
-            huidig = huidig->buren[richting];    
-            huidigKleur = huidig->buren[richting]->kleur;
-        }
-
-        if(huidigKleur == kleur && counter) {
+        if(huidigKleur == kleur && stappen) {
             zetIsMogelijk = true;
             if(doeZet) {
-                zetSteen(positie, kleur);
-                trekLijn(richting, counter, kleur, huidig);
+                speelZet(positie, kleur, richting, stappen, huidig);
             }
         }
         else {
-            if(counter) {
+            if(stappen) {
                 huidig = vakPtr;
             }
         }
 
     }
-    if(zetIsMogelijk) {
-        volgendeBeurt();
-    }
     
     return zetIsMogelijk;
 }
+// Bepaald welke zetten kunnen en bepaald 'beste' zet
+int Othellobord::recursiefEvaluatie(int iteraties = 0) {
+    Vec2 huidig; // 
+    int score = 0; //Score wordt bepaald door het aantal mogelijke zetten
+    int teller = 0;
 
+    int aantalItteraties = iteraties;
+    int maxIteraties = 5;
+    //if(mogelijkheden) {
+    //    maxIteraties = 100;
+    //}
 
-int Othellobord::gaZettenAf(Othellobord& kopie, int zetten = 0) {
-    Vec2 huidig;
-    int aantalZetten = 0;
-    int aantalIteraties = 3;
-    int maxIteraties = 3;
-    char huidigSpeler = beurt;
+    bool nogVerder = true;
+    
+    int minimum = 32768; // Groot getal zonder betekenis 
+    int maximum = 0;
 
-    for (int y = 0; y < Hoogte; y++) {
+    if(aantalItteraties == maxIteraties) {
+        nogVerder = false;
+    }
+
+    for (int y = 1; y <= Hoogte; y++) {
         huidig.y = y; 
-        for (int x = 0; x < Lengte; x++) {
-            // nkopieerMap();
-            if(kopie.isZetMogelijk(huidig, beurt, true)) {
-                volgendeBeurt();
-                aantalZetten++;
-                if(aantalIteraties == maxIteraties) {
-                    
-                    return aantalZetten;
-                }
-                else {
-                    //aantalZetten = gaZettenAf();
+        for (int x = 1; x <= Lengte; x++) {
+            huidig.x = x;
 
+            if(isZetMogelijk(huidig, Beurt, ZetNiet)) {
+                teller++;
+                // Maak nieuw bord aan
+                Othellobord kopie;
+                maakKopie(kopie);
 
+                // Doe de zet
+                // Een speedup is hier wel mogelijk
+                kopie.isZetMogelijk(huidig, Beurt, ZetWel);
+
+                // Evualuatie:
+
+                // Het aantal zetten is de maat voor de kwaliteit van een zet
+                // Daarom wordt met score het aantal mogelijke zetten bijgehouden
+                score++;
+                
+                if(nogVerder && teller) {
+
+                    aantalItteraties++;
+                    kopie.Beurt = BeurtTegenstander;
+
+                    score = kopie.recursiefEvaluatie(aantalItteraties);
+                    kopie.verwijderen();
+                    aantalItteraties--;
+                    // 4, 3, 2
+                    if(aantalItteraties % 2) {
+                        maximum = max(score, maximum);
+                        score = maximum;
+                        
+                    }
+                    else {
+                        minimum = min(score, minimum);
+                        score = minimum;
+                        if(!aantalItteraties) {
+                            BesteZet = huidig;
+                        }
+                    }   
                 }
             }
         }
     }
+    return score;
 }
+// Speelt de beste zet
+void Othellobord::speelBesteZet() {
 
-
-// Structuur minmax:
-
-/*
-void Othellobord::kopieerMap();
-void Othellobord::gaZettenAf() {
+    int winnaar;
     
-    for (int i = 0; i < mapgrootte; i++)
-    {
-        for (int j = 0; j < mapgrootte; j++)
+    isZetMogelijk(BesteZet, Beurt, true);
+
+    winnaar = winnen();
+    if(winnaar) {
+        switch (winnaar)
         {
-            kopie.isZetMogelijk();
-            kopie.evalueerZet(); // Hoeveel zetten zijn er mogelijk na de zet
-            gaZettenAf();
-
-             
-
+        case 1:
+            cout << "Zwart wint" << endl;
+            break;
+        case 2:
+            cout << "Wit wint" << endl;
+            break;
+        case 3:
+            cout << "Het is remise" << endl;
+            break;
+        default:
+            break;
         }
-        
+        verwijderen();
     }
-    
+    draaiBeurt();
 }
-*/
+
+int Othellobord::telMogelijkeZetten() {
+    Vec2 huidig;
+    int aantalZetten = 0;
+
+    for (int y = 1; y <= Hoogte; y++) {
+        huidig.y = y; 
+        for (int x = 1; x <= Lengte; x++) {
+            huidig.x = x;
+            if(isZetMogelijk(huidig, Beurt, ZetNiet)) {
+                aantalZetten++;
+            }
+        }
+    }
+    return aantalZetten;
+}
+
+
+
+int Othellobord::winnen() {
+    Vec2 huidig;
+    Vec2 stenen = {0, 0}; // Zwart = x, Wit = y
+    Bordvakje* huidigPtr;
+
+    for (int y = 1; y <= Hoogte; y++) {
+        huidig.y = y; 
+        for (int x = 1; x <= Lengte; x++) {
+            huidig.x = x;
+
+            if(isZetMogelijk(huidig, BeurtTegenstander, ZetNiet)) {
+                return 0; // Niet gewonnen
+            }
+
+            huidigPtr = elementPtr(huidig);
+            if(huidigPtr->kleur == 'z') {
+                stenen.x++;
+            }
+            else if (huidigPtr->kleur == 'w') {
+                stenen.y++;
+            }
+            
+        }
+    }
+    if(stenen.x > stenen.y) {
+        return 1; // Zwart wint
+    }
+    if(stenen.y < stenen.x) {
+        return 2; // Wit wint
+    }
+    else {
+        return 3; // Remise
+    }
+}
+
+Othellobord::Othellobord(int lengte, int hoogte, char speler, int vervolgpartijen) {
+    Lengte = lengte;
+    Hoogte = hoogte;
+    Speler = speler;
+    Vervolgpartijen = vervolgpartijen;
+
+    Beurt = 'z';
+    BeurtTegenstander = 'w';
+
+    ritsMap();
+
+    // Startpositie (Kan dit beter?)
+    Vec2 startpositie = {Lengte/2, Hoogte/2};
+    zetSteen(startpositie,'w');
+    startpositie.x++;
+    zetSteen(startpositie ,'z');
+    startpositie.y++;
+    zetSteen(startpositie ,'w');
+    startpositie.x--;
+    zetSteen(startpositie ,'z');
+}
+
+Bordvakje::Bordvakje()           //     5 4 3
+    {         
+      kleur = '.';
+      for (int i = 0; i < 8; i++) {
+        buren[i] = nullptr;
+      }
+    }
+
+Bordvakje::~Bordvakje()           //     5 4 3
+{         
+    for (int i = 0; i < 8; i++) {
+        if (buren[i] != nullptr ) {
+            delete buren[i];
+        }
+        //delete   
+    }
+}
+
+void Othellobord::verwijderen() {
+    Bordvakje* omlaag = ingang;
+    Bordvakje* rechts;
+ 
+    while(omlaag) {
+        rechts = omlaag;
+        while(rechts) {
+            if ( rechts->buren[6] != nullptr ) {
+                delete rechts->buren[6];
+            }
+            if ( rechts->buren[7] != nullptr ) {
+                delete rechts->buren[7];
+            }
+            if ( rechts->buren[0] != nullptr ) {
+                delete rechts->buren[0];
+            }
+            if ( rechts->buren[1] != nullptr ) {
+                delete rechts->buren[1];
+            }
+            rechts = rechts->buren[2];
+        }
+        cout << "\n";
+        omlaag = omlaag->buren[4];
+    }
+}
+
+Othellobord::~Othellobord() {
+    verwijderen();
+}

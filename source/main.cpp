@@ -88,8 +88,14 @@ void leegTerminal() {
          << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
          << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 }
+
 int min(int a, int b) {
     int result = (a < b) ? a : b;
+    return result;
+}
+
+int max(int a, int b) {
+    int result = (a > b) ? a : b;
     return result;
 }
 
@@ -119,12 +125,14 @@ int hoofdMenu(Othellobord & othellobord) {
             break;
         case 't':
         case 'T':
-            //othellobord.gaZettenAf(); 
+            othellobord.recursiefEvaluatie(0);
+            othellobord.speelBesteZet();
             break;
         case 'z':
         case 'Z':
             othellobord.krijgZet();
             leegTerminal();
+            //winnen();
             break;
         default:
             cout << "Niet toegestane menukeuze ..." << endl;
@@ -144,16 +152,12 @@ int main() {
 
     if(krijgParameters(lengte, hoogte, speler, vervolgpartijen)) {
         Othellobord othellobord(lengte, hoogte, speler, vervolgpartijen);
-        Othellobord kopie(lengte, hoogte, speler, vervolgpartijen);
         hoofdMenu(othellobord);
     }
     else {
         Othellobord othellobord;
-        Othellobord kopie;
         hoofdMenu(othellobord);
     }
-    
-    
     return 0;
 }
  
