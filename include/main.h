@@ -7,10 +7,11 @@ typedef struct
 }Vec2;
 
 // Krijg
-char krijgInvoer();
-int krijgGetal();
+void krijgInvoer(char&, int&);
 
 // Util
 void leegTerminal();
 int min(int, int);
 int max(int, int);
+
+//int spelOver(Othellobord & othellobord);

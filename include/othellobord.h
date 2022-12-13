@@ -34,6 +34,8 @@ class Othellobord
     int Hoogte;
     int Vervolgpartijen;
     char Speler; // 0 = player v player, 1 = player v bot, 2 = bot v bot
+    bool Bot1;
+    bool Bot2;
 
     char Beurt;
     char BeurtTegenstander;
@@ -62,14 +64,19 @@ class Othellobord
     int telMogelijkeZetten();
     void stopSpel();
     void verwijderen();
+    void maakOngedaan();
+    void speelSpel();
+    bool spelerZet();
 
     // Constructor
-    Othellobord(int lengte = 8, int hoogte = 8, char speler = 'z', int vervolgpartijen = 0) {
+    Othellobord(int lengte = 8, int hoogte = 8, int vervolgpartijen = 0, bool bot1 = 0, bool bot2 = 0) {
       Lengte = lengte;
       Hoogte = hoogte;
-      Speler = speler;
       Vervolgpartijen = vervolgpartijen;
+      Bot1 = bot1;
+      Bot2 = bot2;
 
+      
       Beurt = 'z';
       BeurtTegenstander = 'w';
 
@@ -86,5 +93,5 @@ class Othellobord
       zetSteen(startpositie ,'z');
     }
     // Destructor
-    //~Othellobord();
+    ~Othellobord();
 };

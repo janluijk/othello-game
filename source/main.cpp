@@ -2,63 +2,73 @@
 #include <othellobord.h>
 using namespace std;
 
-// Krijg
-char krijgInvoer() {
-    char input;
+// Input van speler
+void krijgInvoer(char& krijgLetter, int& krijgGetal) {
+    char letterInput;
+    int getal = 0;
+    int decimaal;
 
-    do { // Alle tabs en enters worden weggehaald
-        input = cin.get();
-    } while (input == '\n' || input == '\t');
-    return input;
-}
-int krijgGetal() {
-    char input;
-    int  getal    = 0;
-    int  decimaal = 0;
+    do {
+        letterInput = cin.get();
+    } while (letterInput == '\n' || letterInput == '\t');
 
-    input = krijgInvoer(); // eerste niet-enter
-    while(input < '0' || input > '9') { // zolang geen getal, verder zoeken
-        input = cin.get();
-    }
-    while(input >= '0' && input <= '9') { // zolang integer: maak getal van
-        decimaal = input - '0'; // converteren van karakter naar integer
+    if('0' <= letterInput && letterInput <= '9') {
+        krijgLetter = '.';
+        decimaal = letterInput - '0';
         getal = getal * 10 + decimaal;
-
-        input = cin.get();
+        letterInput = cin.get();
+        while ('0' <= letterInput && letterInput <= '9') {
+            decimaal = letterInput - '0';
+            getal = getal * 10 + decimaal;
+            letterInput = cin.get();
+        }
+        krijgGetal = getal;
+        return;
     }
-    return getal;
+    else {
+        krijgGetal = 0;
+        krijgLetter = letterInput;
+    }
 }
-bool krijgParameters(int& lengte, int& hoogte, int& speler, int& vervolgpartijen) {
-    char keuze;
 
-    cout << "Wie spelen er? Wit wordt gespeeld door een: \n[Persoon], [Computer] \n:  ";
-    keuze = krijgInvoer();
+char krijgChar() {}
+
+int krijgInt() {}
+
+bool krijgParameters(int& lengte, int& hoogte, int& vervolgpartijen, bool& bot1, bool& bot2) {
+    char keuze;
+    int getal;
+
+    cout << "Wie spelen er? Zwart wordt gespeeld door een: \n[Persoon], [Computer] \n:  ";
+    krijgInvoer(keuze, getal);
     
     switch (keuze)
     {
     case 'p':
     case 'P':
+        bot1 = false;
         break;
     case 'c':
     case 'C':
-        speler++;
+        bot1 = true;
         break;
     default:
         cout << "Geen geldige waarde opgegeven, het spel zal starten met de standaardwaarden!" << endl;
         return false;
     }
 
-    cout << "\nZwart wordt gespeeld door een: \n[Persoon], [Computer], \n:  ";
-    keuze = krijgInvoer();
+    cout << "\nWit wordt gespeeld door een: \n[Persoon], [Computer], \n:  ";
+    krijgInvoer(keuze, getal);
 
     switch (keuze)
     {
     case 'p':
     case 'P':
+        bot2 = false;
         break;
     case 'c':
     case 'C':
-        speler++;
+        bot2 = true;
         break;
     default:
         cout << "Geen geldige waarde opgegeven, het spel zal starten met de standaardwaarden!" << endl;
@@ -66,21 +76,36 @@ bool krijgParameters(int& lengte, int& hoogte, int& speler, int& vervolgpartijen
     }
     
     cout << "Stel nu de mapgrootte in: \nDe lengte van de map wordt: \n: ";
-    lengte = krijgGetal();
+    while(!getal) {
+        krijgInvoer(keuze, getal);
+    }
+    lengte = getal; 
+    getal = 0;
+
     cout << "\n De hoogte van de map wordt: \n: ";
-    hoogte = krijgGetal();
+    while(!getal) {
+        krijgInvoer(keuze, getal);
+    }
+    hoogte = getal;
+    getal = 0;
 
     vervolgpartijen = 0;
 
-    if(speler == 2) {
+    if(bot1 && bot2) {
         cout << "Hoeveel vervolgpartijen wil je spelen? \n: ";
-        vervolgpartijen = krijgGetal();
+        while(!getal) {
+            krijgInvoer(keuze, getal);
+        }
+        vervolgpartijen = getal;
+        getal = 0;
     }
 
     return true; 
 }
 
-// Util
+
+
+// Utilities
 void leegTerminal() {
     //std::system("CLS");
 
@@ -99,65 +124,22 @@ int max(int a, int b) {
     return result;
 }
 
-// Menu
-int hoofdMenu(Othellobord & othellobord) {
-    char keuze;
-    leegTerminal();
-    
-    do {
-        othellobord.afdrukken();
-        cout << "Kies uit: [s]toppen, [t]el mogelijke zetten" << endl
-             << "          [a]fdrukken, [z]etten" << endl
-             << "Uw keuze: ";
-        cin >> keuze;
-        switch (keuze)
-        {
-        case 's':
-        case 'S':
-            cout << "Dat was het dan ..." << endl;
-            break;
-        case 'a':
-        case 'A':
-            othellobord.afdrukken();
-            break;
-        case 'l':
-        case 'L':
-            break;
-        case 't':
-        case 'T':
-            othellobord.recursiefEvaluatie(0);
-            othellobord.speelBesteZet();
-            break;
-        case 'z':
-        case 'Z':
-            othellobord.krijgZet();
-            leegTerminal();
-            //winnen();
-            break;
-        default:
-            cout << "Niet toegestane menukeuze ..." << endl;
-        } // switch
-    }     // do 
-    while( !(keuze == 's') && !(keuze == 'S'));
 
-    return 1;
-}
 
+// Main
 int main() {
-    int lengte;
-    int hoogte;
-    int speler;
+    // Variablen
+    int lengte, hoogte;
+    bool bot1, bot2;
     int vervolgpartijen;
-    vervolgpartijen = 5;
 
-    if(krijgParameters(lengte, hoogte, speler, vervolgpartijen)) {
-        Othellobord othellobord(lengte, hoogte, speler, vervolgpartijen);
-        hoofdMenu(othellobord);
-    }
-    else {
-        Othellobord othellobord;
-        hoofdMenu(othellobord);
-    }
+
+
+    krijgParameters(lengte, hoogte, vervolgpartijen, bot1, bot2);
+
+    Othellobord othellobord(lengte, hoogte, vervolgpartijen, bot1, bot2);
+    
+    othellobord.speelSpel();
+
     return 0;
 }
- 
