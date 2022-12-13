@@ -2,6 +2,8 @@
 #include <othellobord.h>
 using namespace std;
 
+unsigned int seed = 0;
+
 // Input van speler
 void krijgInvoer(char& krijgLetter, int& krijgGetal) {
     char letterInput;
@@ -31,78 +33,42 @@ void krijgInvoer(char& krijgLetter, int& krijgGetal) {
     }
 }
 
-char krijgChar() {}
+char krijgChar() {
+    char input;
 
-int krijgInt() {}
-
-bool krijgParameters(int& lengte, int& hoogte, int& vervolgpartijen, bool& bot1, bool& bot2) {
-    char keuze;
-    int getal;
-
-    cout << "Wie spelen er? Zwart wordt gespeeld door een: \n[Persoon], [Computer] \n:  ";
-    krijgInvoer(keuze, getal);
-    
-    switch (keuze)
-    {
-    case 'p':
-    case 'P':
-        bot1 = false;
-        break;
-    case 'c':
-    case 'C':
-        bot1 = true;
-        break;
-    default:
-        cout << "Geen geldige waarde opgegeven, het spel zal starten met de standaardwaarden!" << endl;
-        return false;
-    }
-
-    cout << "\nWit wordt gespeeld door een: \n[Persoon], [Computer], \n:  ";
-    krijgInvoer(keuze, getal);
-
-    switch (keuze)
-    {
-    case 'p':
-    case 'P':
-        bot2 = false;
-        break;
-    case 'c':
-    case 'C':
-        bot2 = true;
-        break;
-    default:
-        cout << "Geen geldige waarde opgegeven, het spel zal starten met de standaardwaarden!" << endl;
-        return false;
-    }
-    
-    cout << "Stel nu de mapgrootte in: \nDe lengte van de map wordt: \n: ";
-    while(!getal) {
-        krijgInvoer(keuze, getal);
-    }
-    lengte = getal; 
-    getal = 0;
-
-    cout << "\n De hoogte van de map wordt: \n: ";
-    while(!getal) {
-        krijgInvoer(keuze, getal);
-    }
-    hoogte = getal;
-    getal = 0;
-
-    vervolgpartijen = 0;
-
-    if(bot1 && bot2) {
-        cout << "Hoeveel vervolgpartijen wil je spelen? \n: ";
-        while(!getal) {
-            krijgInvoer(keuze, getal);
-        }
-        vervolgpartijen = getal;
-        getal = 0;
-    }
-
-    return true; 
+    do { // Alle tabs en enters worden weggehaald
+        input = cin.get();
+    } while (input == '\n' || input == '\t');
+    return input;
 }
 
+int krijgGetal() {
+    char input;
+    int  getal    = 0;
+    int  decimaal = 0;
+
+    input = krijgChar(); // eerste niet-enter
+    while(input < '0' || input > '9') { // zolang geen getal, verder zoeken
+        input = cin.get();
+    }
+    while(input >= '0' && input <= '9') { // zolang integer: maak getal van
+        decimaal = input - '0'; // converteren van karakter naar integer
+        getal = getal * 10 + decimaal;
+
+        input = cin.get();
+    }
+    return getal;
+}
+
+int randomNumber() {
+    // Static: seed wordt 1 keer geinitialiseerd
+    int m = 2147483647; // Lehmer random number generator
+    int a = 1103515245 ;      // Dit zijn specifiek gekozen constanten
+    int c = 12345;
+
+    seed = (a * seed + c) % m;
+    return seed;
+}
 
 
 // Utilities
@@ -128,18 +94,12 @@ int max(int a, int b) {
 
 // Main
 int main() {
-    // Variablen
-    int lengte, hoogte;
-    bool bot1, bot2;
-    int vervolgpartijen;
 
-
-
-    krijgParameters(lengte, hoogte, vervolgpartijen, bot1, bot2);
-
-    Othellobord othellobord(lengte, hoogte, vervolgpartijen, bot1, bot2);
+    Othellobord othellobord;
+    othellobord.menuSpel();
+    while (1)
+    {
+    }
     
-    othellobord.speelSpel();
-
     return 0;
 }

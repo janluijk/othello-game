@@ -1,3 +1,2 @@
 .vscode
-build/othello.exe
-.vscode/tasks.json
+build
