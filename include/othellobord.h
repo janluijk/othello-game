@@ -20,6 +20,9 @@ class Othellobord
     // Functies
     Bordvakje* elementPtr(Vec2);
     void trekLijn(int, int, Bordvakje*);
+
+    // Undo
+    Othellobord* maakOngedaan(Othellobord*);
     void speelZet(Vec2, char, int, int, Bordvakje*);
     void maakKopie(Othellobord* kopie);
 
@@ -41,19 +44,17 @@ class Othellobord
     // Globals
     bool SpelIsOver = false;
     bool Undo = false;
-    Vec2 BesteZet;
+    Vec2 goedeZetten[10];
     int MaxIteraties = 5;
   
     //int recursiefEvaluatie(int);
     //void speelBesteZet();
 
-    // Undo
-    void maakOngedaan();
-
     // Init
     void startPositie();
     void zetSteen(Vec2, char);
     void menuSpel();
+    void simulatieSpel();
     void krijgParameters();
     void ritsMap();
 
@@ -63,9 +64,9 @@ class Othellobord
     
 
     // Winnen en tellen
-    void winnen();
+    char winnen();
     int telMogelijkeZetten();
-    int aantalVervolgzetten(int);
+    int aantalVervolgzetten();
     char isSpelOver();
     bool isZetMogelijk(bool, Vec2); // Als bool waar: zet wordt meteen uitgevoerd.
     
@@ -73,9 +74,10 @@ class Othellobord
     void spelerZet();
     void randomZet();
     bool spelerOpties(char);
+    int recursiefBesteZet(int);
 
     // Constructor en destructor
     Othellobord();
-    Othellobord(int, int, char, char);
+    Othellobord(int, int, char, char, bool, bool);
     ~Othellobord();
 };

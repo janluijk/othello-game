@@ -1,6 +1,8 @@
 #include <iostream>
 #include <othellobord.h>
 #include <cstdlib>
+#include <ctime>
+#include <fstream>
 using namespace std;
 
 // TODO
@@ -33,16 +35,6 @@ Bordvakje::~Bordvakje() {
         buren[i] = nullptr;
     }
 }
-
-
-void Othellobord::maakOngedaan() {
-    // Ga terug naar vorige
-    this->vorige->spelerZet();
-    // delete
-}
-
-
-
 
 
 // Handige functies
@@ -96,14 +88,13 @@ void Othellobord::maakKopie(Othellobord*  kopie) { // kopie van bord en gelinkt
     Bordvakje* rechts;
 
     // is er een manier om vec2 meteen in argument van functie te initialiseren?
-    Vec2 begin = {1, 1};
-    Bordvakje* kopieOmlaag = kopie->elementPtr(begin);
+    Bordvakje* kopieOmlaag = kopie->Ingang;
     Bordvakje* kopieRechts;
     
-    while(omlaag) {
+    while(omlaag != nullptr) {
         rechts = omlaag;
         kopieRechts = kopieOmlaag; 
-        while(rechts) {
+        while(rechts != nullptr) {
 
             kopieRechts->kleur = rechts->kleur;
 
@@ -157,14 +148,18 @@ int  Othellobord::telMogelijkeZetten() { // Hoeveel zetten speelbaar
     return aantalZetten;
 }
 
-void Othellobord::winnen() {            // Wat als gewonnen
+char Othellobord::winnen() {            // Wat als gewonnen
     char winnaar = isSpelOver();
 
     if(winnaar) {
-        leegTerminal();
-        afdrukken();
+        
+        if(!Bot1 || !Bot2) {
+            leegTerminal();
+            afdrukken();
+        }
         SpelIsOver = true;
     }
+    return winnaar;
 }
 
 char Othellobord::isSpelOver() {        // is spel afgelopen
@@ -200,13 +195,9 @@ char Othellobord::isSpelOver() {        // is spel afgelopen
     else { return Speler2; }
 }
 
-int Othellobord::aantalVervolgzetten(int iteraties) { // Returnt aantal vervolgzetten
+int Othellobord::aantalVervolgzetten() { // Returnt aantal vervolgzetten
     Vec2 positie;
     int mogelijkeZetten = 0;
-
-    int aantalIteraties = iteraties;
-    int maxIteraties = 1000;
-
 
     for (int y = 1; y <= Hoogte; y++) {
         positie.y = y; 
@@ -220,7 +211,7 @@ int Othellobord::aantalVervolgzetten(int iteraties) { // Returnt aantal vervolgz
                 mogelijkeZetten++;
                 // Maak nieuw bord aan
                 
-                Othellobord kopie(Lengte, Hoogte, Speler1, Speler2);
+                Othellobord kopie(Lengte, Hoogte, Speler1, Speler2, Bot1, Bot2);
                 maakKopie(&kopie);
                 // Doe de zet
                 // Een speedup is hier wel mogelijk
@@ -228,11 +219,7 @@ int Othellobord::aantalVervolgzetten(int iteraties) { // Returnt aantal vervolgz
 
 
                 kopie.draaiSpeler();
-                mogelijkeZetten += kopie.aantalVervolgzetten(aantalIteraties);
-                if(aantalIteraties < maxIteraties) {
-                    aantalIteraties++;
-                    
-                }
+                mogelijkeZetten += kopie.aantalVervolgzetten();
             }
         }
     }
@@ -294,6 +281,7 @@ bool Othellobord::spelerOpties(char letterKeuze) { // Geeft aantal opties als bv
     case 'U':
     case 'u':
         Undo = true;
+        return true;
         break;
     case 'S':
     case 's': 
@@ -306,7 +294,7 @@ bool Othellobord::spelerOpties(char letterKeuze) { // Geeft aantal opties als bv
         break;
     case 'V':
     case 'v':
-        cout << aantalVervolgzetten(0) << endl;
+        cout << aantalVervolgzetten() << endl;
     default:
         return false;
     }
@@ -317,8 +305,7 @@ void Othellobord::randomZet() {         // Computer speelt random zet
     Vec2 positie;
     bool zetIsMogelijk = false;
     while(!zetIsMogelijk) {
-        int random;
-        random = rand();
+        int random = rand();
         positie.x = (random % Lengte) + 1;
         random = rand();
         positie.y = (random % Hoogte) + 1;
@@ -359,6 +346,69 @@ void Othellobord::spelerZet() {         // Speler speelt zet
             cout << "de zet was niet mogelijk, voer juiste coordinaten in!" << endl;
         }
     }
+}
+
+int Othellobord::recursiefBesteZet(int iteraties) {
+    Vec2 positie;
+    int aantalZetten = 0;
+
+    
+
+    int aantalGoedeZetten = 0;
+
+    int aantalIteraties = iteraties;
+    int maxIteraties = 4;
+    
+    int minimum = 32768; // Groot getal zonder betekenis 
+    int maximum = 0;
+
+    for (int y = 1; y <= Hoogte; y++) {
+        positie.y = y; 
+        for (int x = 1; x <= Lengte; x++) {
+            positie.x = x;
+
+            if(isZetMogelijk(DoeZetNiet, positie)) {
+                aantalZetten++;
+                // Maak nieuw bord aan
+                
+                Othellobord kopie(Lengte, Hoogte, Speler1, Speler2, Bot1, Bot2);
+                maakKopie(&kopie);
+ 
+                kopie.isZetMogelijk(DoeZetWel, positie);
+
+                if(aantalIteraties < maxIteraties) {
+                    aantalIteraties++;
+                    
+                    kopie.draaiSpeler();
+
+                    aantalZetten = kopie.recursiefBesteZet(aantalIteraties);
+                    
+                    aantalIteraties--;
+
+                    if(aantalIteraties % 2 == 0) {
+                        maximum = max(aantalZetten, maximum);
+                        aantalZetten = maximum;
+                    }
+                    else {
+                        minimum = min(aantalZetten, minimum);
+                        aantalZetten = minimum;
+                        if(!aantalIteraties ) {
+                            if(aantalGoedeZetten < 10) {
+                                goedeZetten[aantalGoedeZetten] = positie;
+                                aantalGoedeZetten++; 
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    while(!aantalIteraties && aantalGoedeZetten < 10) {
+        goedeZetten[aantalGoedeZetten] = goedeZetten[1];
+        aantalGoedeZetten++; 
+    }
+
+    return aantalZetten;
 }
 
 
@@ -498,49 +548,101 @@ void Othellobord::ritsMap() {           // Pointerstructuur van map
     }
 }
 
+void Othellobord::simulatieSpel() {
+    int spelTeller = 0;
+    startPositie();
+    string uitvoer = "uitvoer.txt";
+    char winnaar;
+    bool beurt = false;
+
+    ofstream output(uitvoer);
+
+    while(Vervolgpartijen >= spelTeller) {
+        //randomZet();
+        if(beurt) {
+            beurt = false;
+            randomZet();
+        }
+        else {
+            beurt = true;
+            recursiefBesteZet(0);
+            isZetMogelijk(DoeZetWel, goedeZetten[rand() % 10]);
+        }
+
+        //leegTerminal();
+        //afdrukken();
+
+        draaiSpeler();
+        winnaar = winnen();
+
+        if(SpelIsOver) {
+            output.put(winnaar);
+            spelTeller++;
+            SpelIsOver = false; 
+            startPositie();
+        }
+    }
+}
+
 void Othellobord::menuSpel() {          // Menu
     int spelTeller = 0;
     startPositie();
 
-    while(Vervolgpartijen >= spelTeller) {
-        if(!Bot1 || !Bot2) {
-            leegTerminal();
-            afdrukken();
-            cout << "toets 'U' voor ongedaan maken" << endl <<
+    Othellobord* huidig = this;
+    Othellobord* temp;
+
+
+    while(huidig->Vervolgpartijen >= spelTeller) {
+        Othellobord* kopie = new Othellobord(huidig->Lengte, huidig->Hoogte, huidig->Speler1, huidig->Speler2, huidig->Bot1, huidig->Bot2);
+        huidig->maakKopie(kopie);
+
+        leegTerminal();
+        huidig->afdrukken();
+        cout << "toets 'U' voor ongedaan maken" << endl <<
                     "toets 'A' voor het aantal mogelijke zetten" << endl <<
                     "toets 'S' om te stoppen met het spel" << endl <<
                     "toets 'V' voor het aantal vervolgstappen" << endl <<
-                    "--" << Speler1 << "--" << endl;
-        }
+                    "--" << huidig->Speler1 << "--" << endl;
         
-        if(Bot1) {
-            if(!Bot1 || !Bot2) {
-                cout << "Computer denkt na..." << endl;
-            }
+        if(huidig->Bot1) {  
+            cout << "Computer denkt na..." << endl;
+
             //recursiefEvaluatie(0);
-            
             //speelBesteZet();
-            randomZet();
-            
+
+            kopie->randomZet();
         }
         else {
-            spelerZet(); 
+            kopie->spelerZet(); 
         }
-        draaiSpeler();
-        winnen();
-        if(SpelIsOver) { // clever shit
+
+        if(SpelIsOver) {
             spelTeller++;
             SpelIsOver = false;
-            startPositie();
+            kopie->startPositie();
+        }
+        else {
+            if(kopie->Undo && huidig->vorige != nullptr) {
+                huidig = huidig->vorige;
+                kopie->Undo = false;
+            }
+            else {
+                kopie->draaiSpeler();
+                kopie->winnen();
+
+                temp = huidig;
+                huidig = huidig->volgende;
+                huidig->vorige = temp;
+            }
         }
     }
-
 }
 
 Othellobord::Othellobord() {            // Default constructor
     Speler1 = 'z';
     Speler2 = 'w';
 
+    srand(time(NULL));
     krijgParameters();
     ritsMap();
 
@@ -548,12 +650,15 @@ Othellobord::Othellobord() {            // Default constructor
     volgende = nullptr;
 }
 
-Othellobord::Othellobord(int lengte, int hoogte, char speler1, char speler2) {
+Othellobord::Othellobord(int lengte, int hoogte, char speler1, char speler2, bool bot1, bool bot2) {
     Lengte = lengte;
     Hoogte = hoogte;
 
     Speler1 = speler1;
     Speler2 = speler2;
+
+    Bot1 = bot1;
+    Bot2 = bot2;
 
     ritsMap();
 }
@@ -582,70 +687,6 @@ Othellobord::~Othellobord() {           // Destructor
   
 /*
 
-int Othellobord::recursiefEvaluatie(int iteraties) {
-    Vec2 huidig; // 
-    int score = 0; //Score wordt bepaald door het aantal mogelijke zetten
-    int teller = 0;
 
-    int aantalIteraties = iteraties;
-    int maxIteraties = 5;
-    //if(mogelijkheden) {
-    //    maxIteraties = 100;
-    //}
-
-    bool nogVerder = true;
-    
-    int minimum = 32768; // Groot getal zonder betekenis 
-    int maximum = 0;
-    
-    if(aantalIteraties == maxIteraties) {
-        nogVerder = false;
-    }
-
-    for (int y = 1; y <= Hoogte; y++) {
-        huidig.y = y; 
-        for (int x = 1; x <= Lengte; x++) {
-            huidig.x = x;
-
-            if(isZetMogelijk(huidig, Beurt, ZetNiet)) {
-                teller++;
-                // Maak nieuw bord aan
-                
-                Othellobord kopie;
-                maakKopie(kopie);
- 
-                // Doe de zet
-                // Een speedup is hier wel mogelijk
-                kopie.isZetMogelijk(huidig, Beurt, ZetWel);
-                // Evualuatie:
-                // Het aantal zetten is de maat voor de kwaliteit van een zet
-                // Daarom wordt met score het aantal mogelijke zetten bijgehouden
-                score++;
-                if(nogVerder) {
-                    aantalIteraties++;
-                    draaiBeurt();
-                    kopie.Beurt = Beurt;
-                    draaiBeurt();
-                    score = kopie.recursiefEvaluatie(aantalIteraties);
-                    kopie.verwijderen();
-                    aantalIteraties--;
-
-                    if(aantalIteraties % 2) {
-                        maximum = max(score, maximum);
-                        score = maximum;
-                    }
-                    else {
-                        minimum = min(score, minimum);
-                        score = minimum;
-                        if(!aantalIteraties) {
-                            BesteZet = huidig;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return score;
-}
 
 */

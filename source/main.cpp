@@ -96,10 +96,10 @@ int max(int a, int b) {
 int main() {
 
     Othellobord othellobord;
-    othellobord.menuSpel();
-    while (1)
-    {
-    }
+    if(othellobord.Bot1 && othellobord.Bot2) { othellobord.simulatieSpel(); }
+    else { othellobord.menuSpel(); }
+    
+    cout << "Tot ziens!" << endl;
     
     return 0;
 }
