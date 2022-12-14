@@ -5,20 +5,14 @@ class Bordvakje
   public:
     char kleur;           //     7 0 1
     Bordvakje* buren[8];  //     6   2
-    Bordvakje() {
-      kleur = '.';
-      for (int i = 0; i < 8; i++) {
-        buren[i] = nullptr;
-      }
-    }
-    //~Bordvakje();
+    Bordvakje();
+    ~Bordvakje();
 
 };//bordvakje
 
 class Othellobord 
 {
   private:
-    // Variablen
     Bordvakje* Ingang;
     Othellobord* vorige;
     Othellobord* volgende;
@@ -26,61 +20,62 @@ class Othellobord
     // Functies
     Bordvakje* elementPtr(Vec2);
     void trekLijn(int, int, Bordvakje*);
-    void ritsMap();
     void speelZet(Vec2, char, int, int, Bordvakje*);
+    void maakKopie(Othellobord* kopie);
 
   public:
-    // Variablen
     // Geinitialiseerd door speler:
-    int Lengte;
-    int Hoogte;
+    int Lengte = 8;
+    int Hoogte = 8;
     int Vervolgpartijen = 0;
     bool Bot1 = false;
     bool Bot2 = false;
 
-    char Speler1;
-    char Speler2;
+    char Speler1 = 'z';
+    char Speler2 = 'w';
 
+    // Leesbaarheid
     bool DoeZetWel = true;
     bool DoeZetNiet = false;
 
+    // Globals
+    bool SpelIsOver = false;
+    bool Undo = false;
     Vec2 BesteZet;
     int MaxIteraties = 5;
-    
-    bool SpelIsOver = false;
   
-    // Data van spelers
-    Vec2 krijgCoordinaten(); 
-    char krijgKleur();
-    void krijgZet();
-    void krijgParameters();
+    //int recursiefEvaluatie(int);
+    //void speelBesteZet();
 
-    int recursiefEvaluatie(int);
-    bool isZetMogelijk(bool, Vec2); // Als bool waar: zet wordt meteen uitgevoerd.
-    void speelBesteZet();
-    void maakKopie(Othellobord* kopie);
-    
-    // Handige functies
-    void zetSteen(Vec2, char);
-    void draaiSpeler();
-    void afdrukken();
-    void winnen();
-    int telMogelijkeZetten();
-    void stopSpel();
-    void verwijderen();
-    void speelSpel();
-    void spelerZet();
-    void menuSpel();
-    void randomZet();
-    char isSpelOver();
-    void spelerOpties(char);
-    Vec2 ptrNaarPos(Bordvakje*);
-    void startPositie();
+    // Undo
     void maakOngedaan();
 
-    // Constructor
+    // Init
+    void startPositie();
+    void zetSteen(Vec2, char);
+    void menuSpel();
+    void krijgParameters();
+    void ritsMap();
+
+    // Handig
+    void draaiSpeler();
+    void afdrukken();
+    
+
+    // Winnen en tellen
+    void winnen();
+    int telMogelijkeZetten();
+    int aantalVervolgzetten(int);
+    char isSpelOver();
+    bool isZetMogelijk(bool, Vec2); // Als bool waar: zet wordt meteen uitgevoerd.
+    
+    // Spelen
+    void spelerZet();
+    void randomZet();
+    bool spelerOpties(char);
+
+    // Constructor en destructor
     Othellobord();
     Othellobord(int, int, char, char);
-    // Destructor
     ~Othellobord();
 };
