@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
+#include <string> 
 using namespace std;
 
 // TODO
@@ -348,18 +349,13 @@ void Othellobord::spelerZet() {         // Speler speelt zet
     }
 }
 
-int Othellobord::recursiefBesteZet(int iteraties) {
+int Othellobord::recursiefBesteZet(int iteraties) { // Zoekt zet waarvoor tegenstander minste zetten kan doen
     Vec2 positie;
     int aantalZetten = 0;
-
-    
-
-    int aantalGoedeZetten = 0;
-
     int aantalIteraties = iteraties;
-    int maxIteraties = 4;
-    
-    int minimum = 32768; // Groot getal zonder betekenis 
+    int maxIteraties = 5;
+
+    int minimum = 32767; // Groot getal zonder betekenis 
     int maximum = 0;
 
     for (int y = 1; y <= Hoogte; y++) {
@@ -383,31 +379,32 @@ int Othellobord::recursiefBesteZet(int iteraties) {
 
                     aantalZetten = kopie.recursiefBesteZet(aantalIteraties);
                     
-                    aantalIteraties--;
-
+                    aantalIteraties = aantalIteraties - 1;
                     if(aantalIteraties % 2 == 0) {
-                        maximum = max(aantalZetten, maximum);
-                        aantalZetten = maximum;
+                        if(aantalZetten < minimum) {
+                            if(!aantalIteraties) {
+                                GoedeZet = positie;
+                            }
+                            minimum = aantalZetten;
+                        }
+                        else {
+                            aantalZetten = minimum;
+                        }
+                        
                     }
                     else {
-                        minimum = min(aantalZetten, minimum);
-                        aantalZetten = minimum;
-                        if(!aantalIteraties ) {
-                            if(aantalGoedeZetten < 10) {
-                                goedeZetten[aantalGoedeZetten] = positie;
-                                aantalGoedeZetten++; 
-                            }
+                        if(aantalZetten > maximum) {
+                            maximum = aantalZetten;
                         }
+                        else {
+                            aantalZetten = maximum;
+                        }
+                                
                     }
                 }
             }
         }
     }
-    while(!aantalIteraties && aantalGoedeZetten < 10) {
-        goedeZetten[aantalGoedeZetten] = goedeZetten[1];
-        aantalGoedeZetten++; 
-    }
-
     return aantalZetten;
 }
 
@@ -548,17 +545,19 @@ void Othellobord::ritsMap() {           // Pointerstructuur van map
     }
 }
 
-void Othellobord::simulatieSpel() {
+void Othellobord::simulatieSpel() {     // Simuleert spellen door bots
     int spelTeller = 0;
-    startPositie();
-    string uitvoer = "uitvoer.txt";
+    int aantalZetten = 0;
     char winnaar;
     bool beurt = false;
+    string aantal;
+    ofstream output;
+    output.open("uitvoer.txt");
 
-    ofstream output(uitvoer);
+
+    startPositie();
 
     while(Vervolgpartijen >= spelTeller) {
-        //randomZet();
         if(beurt) {
             beurt = false;
             randomZet();
@@ -566,19 +565,20 @@ void Othellobord::simulatieSpel() {
         else {
             beurt = true;
             recursiefBesteZet(0);
-            isZetMogelijk(DoeZetWel, goedeZetten[rand() % 10]);
+            isZetMogelijk(DoeZetWel, GoedeZet);
+            aantalZetten++;
         }
-
-        //leegTerminal();
-        //afdrukken();
 
         draaiSpeler();
         winnaar = winnen();
 
         if(SpelIsOver) {
-            output.put(winnaar);
+            output << winnaar << " " << aantalZetten << endl;
             spelTeller++;
-            SpelIsOver = false; 
+            SpelIsOver = false;
+            beurt = false;
+            aantalZetten = 0;
+
             startPositie();
         }
     }
@@ -604,21 +604,24 @@ void Othellobord::menuSpel() {          // Menu
                     "toets 'V' voor het aantal vervolgstappen" << endl <<
                     "--" << huidig->Speler1 << "--" << endl;
         
-        if(huidig->Bot1) {  
+        if(kopie->Bot1) {  
             cout << "Computer denkt na..." << endl;
 
             //recursiefEvaluatie(0);
             //speelBesteZet();
 
-            kopie->randomZet();
+            //kopie->randomZet();
+            kopie->recursiefBesteZet(0);
+            kopie->isZetMogelijk(DoeZetWel, kopie->GoedeZet);
+
         }
         else {
             kopie->spelerZet(); 
         }
 
-        if(SpelIsOver) {
+        if(kopie->SpelIsOver) {
             spelTeller++;
-            SpelIsOver = false;
+            kopie->SpelIsOver = false;
             kopie->startPositie();
         }
         else {
@@ -683,10 +686,3 @@ Othellobord::~Othellobord() {           // Destructor
     }
 
 }
-
-  
-/*
-
-
-
-*/

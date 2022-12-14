@@ -22,8 +22,6 @@ class Othellobord
     void trekLijn(int, int, Bordvakje*);
 
     // Undo
-    Othellobord* maakOngedaan(Othellobord*);
-    void speelZet(Vec2, char, int, int, Bordvakje*);
     void maakKopie(Othellobord* kopie);
 
   public:
@@ -44,11 +42,8 @@ class Othellobord
     // Globals
     bool SpelIsOver = false;
     bool Undo = false;
-    Vec2 goedeZetten[10];
+    Vec2 GoedeZet;
     int MaxIteraties = 5;
-  
-    //int recursiefEvaluatie(int);
-    //void speelBesteZet();
 
     // Init
     void startPositie();
