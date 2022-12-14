@@ -1,5 +1,5 @@
 #include <iostream>
-#include <othellobord.h>
+#include "othellobord.h"
 using namespace std;
 
 unsigned int seed = 0;

@@ -1,5 +1,5 @@
 #include <iostream>
-#include <othellobord.h>
+#include "othellobord.h"
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -296,6 +296,7 @@ bool Othellobord::spelerOpties(char letterKeuze) { // Geeft aantal opties als bv
     case 'V':
     case 'v':
         cout << aantalVervolgzetten() << endl;
+        break;
     default:
         return false;
     }
@@ -321,7 +322,7 @@ void Othellobord::spelerZet() {         // Speler speelt zet
     
     // Variablen voor zet
     Vec2 zet;
-    bool zetIsMogelijk;
+    bool zetIsMogelijk = false;
 
     while(!zetIsMogelijk) {
         cout << "Geef x-coordinaat: " << endl;
